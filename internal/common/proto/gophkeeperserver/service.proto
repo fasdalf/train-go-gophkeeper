@@ -1,0 +1,86 @@
+syntax = "proto3";
+// I could use `import "google/protobuf/empty.proto";` but there wa trouble with import
+
+package gophkeeperserver;
+
+option go_package = "internal/proto/gophkeeperserver";
+
+service GophKeeper {
+  rpc UserSignUp(UserSignUpRequest) returns (UserSignUpResponse);
+  rpc UserSignIn(UserSignInRequest) returns (UserSignInResponse);
+  rpc ListSecrets(ListSecretsRequest) returns (ListSecretsResponse);
+  rpc CreateSecret(CreateSecretRequest) returns (CreateSecretResponse);
+  rpc UpdateSecret(UpdateSecretRequest) returns (UpdateSecretResponse);
+  rpc DeleteSecret(DeleteSecretRequest) returns (DeleteSecretResponse);
+}
+
+message UserSignUpRequest {
+  string login = 1;
+  string password = 2;
+  bytes key = 3;
+}
+
+message UserSignUpResponse {
+  string token = 1;
+}
+
+message UserSignInRequest {
+  string login = 1;
+  string password = 2;
+}
+
+message UserSignInResponse {
+  string token = 1;
+  bytes key = 3;
+}
+
+message ListSecretsRequest {
+  int64 from_ts = 1; // From unixtime in nanoseconds
+}
+
+message ListSecretsResponse {
+  message secret {
+    int64 id = 1;
+    bytes data = 2; // not set with is_deleted=true
+    int64 ts = 3; // Server's save unixtime in nanoseconds
+    bool is_deleted = 4; // not set with non empty data TODO: maybe later
+  }
+  repeated secret secrets = 1; // All new and updated secrets
+  int64 sync_ts = 2; // All values are saved until this unixtime in nanoseconds
+}
+
+message CreateSecretRequest {
+  bytes data = 1;
+}
+
+message CreateSecretResponse {
+  int64 id = 1; // Server's id for synchronisation
+  int64 ts = 2; // Server's save unixtime in nanoseconds
+}
+
+message UpdateSecretRequest {
+  int64 id = 1; // Server's id for synchronisation
+  int64 old_ts = 2; // Client's save unixtime in nanoseconds
+  bytes data = 3; // New data
+}
+
+message UpdateSecretResponse {
+  TimeStampStatus status = 1; // Status of the operation
+  int64 new_ts = 2; // Save unixtime in nanoseconds
+}
+
+message DeleteSecretRequest {
+  int64 id = 1; // Server's id for synchronisation
+  int64 old_ts = 2; // Client's save unixtime in nanoseconds
+}
+
+message DeleteSecretResponse {
+  TimeStampStatus status = 1; // Status of the operation
+}
+
+enum TimeStampStatus {
+  UNDEFINED = 0; // For compatibility
+  SUCCESS = 1; // All OK
+  TS_MISMATCH = 2; // Current operation conflicts with saved on server. Client should reload data.
+  OTHER_ERROR = 3; // For future use
+}
