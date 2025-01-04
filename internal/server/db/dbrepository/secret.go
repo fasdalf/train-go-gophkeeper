@@ -10,8 +10,15 @@ import (
 var typeCheckSecretDBRepository repository.SecretRepository = &SecretDBRepository{}
 
 type SecretDBRepository struct {
-	db *dbstorage.DBProxy
+	dp *dbstorage.DBProxy
 	// TODO: ##@@ implement methods
+}
+
+// NewSecretDBRepository init
+func NewSecretDBRepository(dp *dbstorage.DBProxy) *SecretDBRepository {
+	return &SecretDBRepository{
+		dp: dp,
+	}
 }
 
 func (r *SecretDBRepository) FindById(Id uint64) (*entity.Secret, error) {

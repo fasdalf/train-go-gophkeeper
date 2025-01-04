@@ -2,55 +2,71 @@ package main
 
 import (
 	"context"
-	"fmt"
-	db "github.com/fasdalf/train-go-gophkeeper/internal/server/db/storage"
+	"github.com/fasdalf/train-go-gophkeeper/internal/common/printbuild"
+	"github.com/fasdalf/train-go-gophkeeper/internal/server/config"
+	"github.com/fasdalf/train-go-gophkeeper/internal/server/db/dbrepository"
+	"github.com/fasdalf/train-go-gophkeeper/internal/server/db/storage"
+	grpcserver "github.com/fasdalf/train-go-gophkeeper/internal/server/grpc/server"
 	"log/slog"
-	"time"
+	"os"
+	"os/signal"
+	"syscall"
 )
 
-//TIP <p>To run your code, right-click the code and select <b>Run</b>.</p> <p>Alternatively, click
-// the <icon src="AllIcons.Actions.Execute"/> icon in the gutter and select the <b>Run</b> menu item from here.</p>
+var (
+	buildVersion string
+	buildDate    string
+	buildCommit  string
+)
 
 func main() {
+	(&printbuild.Data{
+		BuildVersion: buildVersion,
+		BuildDate:    buildDate,
+		BuildCommit:  buildCommit,
+	}).Print()
+
+	ctx := context.Background()
+	cfg := config.GetConfig()
+	db, err := dbstorage.NewDBStorage(ctx, cfg.StorageDBDSN, cfg.StorageDBPrefix)
+	if err != nil {
+		slog.Error("can not migrate the DB", "error", err)
+
+		panic(err)
+	}
+	userRepo := dbrepository.NewUserDBRepository(db)
+	secretRepo := dbrepository.NewSecretDBRepository(db)
+	gs := grpcserver.NewGrpcServer(userRepo, &cfg.CryptoKey, cfg.TokenExp, secretRepo)
+
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGTERM, syscall.SIGINT, syscall.SIGQUIT)
+
+	slog.Info("starting server", "addr", cfg.GRPCAddr)
+	go grpcserver.ListenAndServe(gs, cfg.GRPCAddr)
+
+	<-quit
+	slog.Info("interrupt signal received")
+	signal.Stop(quit)
+	gs.GracefulStop()
+
 	// TODO: ##@@ plan
 	// users repo
 	// grpc service
 	// client forms
 	// grpc client
 
-	//TIP <p>Press <shortcut actionId="ShowIntentionActions"/> when your caret is at the underlined text
-	// to see how GoLand suggests fixing the warning.</p><p>Alternatively, if available, click the lightbulb to view possible fixes.</p>
-	s := "gopher"
-	fmt.Println(fmt.Sprintf("Hello and welcome, %s!", s))
+	// TODO: ##@@ improve 1
+	// secrets repo
+	// auth interceptor
+	// more client forms
+	// auth in grpc client
 
-	for i := 1; i <= 5; i++ {
-		//TIP <p>To start your debugging session, right-click your code in the editor and select the Debug option.</p> <p>We have set one <icon src="AllIcons.Debugger.Db_set_breakpoint"/> breakpoint
-		// for you, but you can always add more by pressing <shortcut actionId="ToggleLineBreakpoint"/>.</p>
-		fmt.Println("i =", 100/i)
-	}
+	// TODO: ##@@ improve N
+	// * Make it work with --version arg only
+	// * quit after output
+	// * move to printbuild package
+	// * Write script to fill them on build.
 
-	time.Now().UnixNano()
-
-	dsn := "host=train-go-gophkeeper_db user=postgres password=postgresP@SS dbname=postgres_gophkeeper sslmode=disable"
-	prefix := "main_"
-	//slog.Info("initializing database connection", "DATABASE_DSN", dsn)
-	////slog.Info("initializing database connection", "DATABASE_DSN", c.StorageDBDSN)
-	//var err error
-	//pgx, err := sql.Open("pgx", dsn)
-	////pgx, err := sql.Open("pgx", c.StorageDBDSN)
-	//if err != nil {
-	//	slog.Error("can not connect to DB", "error", err)
-	//
-	//	panic(err)
-	//}
-	//
-	//defer pgx.Close()
-
-	dbStorage, err := db.NewDBStorage(context.Background(), dsn, prefix)
-	if err != nil {
-		slog.Error("can not migrate the DB", "error", err)
-
-		panic(err)
-	}
-	fmt.Println(dbStorage.Teardown(context.Background()))
+	// TODO: ##@@ improve N+1
+	// * Write cross-platform build script for client and server.
 }
