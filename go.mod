@@ -1,10 +1,16 @@
 module github.com/fasdalf/train-go-gophkeeper
 
-go 1.22
+go 1.22.4
+
+toolchain go1.22.10
 
 require (
+	github.com/caarlos0/env/v6 v6.10.1
+	github.com/golang-jwt/jwt/v4 v4.5.1
+	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.2.0
 	github.com/jackc/pgerrcode v0.0.0-20240316143900-6e2875d9b438
 	github.com/jackc/pgx/v5 v5.7.2
+	github.com/spf13/pflag v1.0.5
 	google.golang.org/grpc v1.69.2
 	google.golang.org/protobuf v1.36.0
 )
@@ -13,6 +19,7 @@ require (
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 // indirect
 	github.com/jackc/puddle/v2 v2.2.2 // indirect
+	github.com/stretchr/testify v1.9.0 // indirect
 	golang.org/x/crypto v0.31.0 // indirect
 	golang.org/x/net v0.30.0 // indirect
 	golang.org/x/sync v0.10.0 // indirect

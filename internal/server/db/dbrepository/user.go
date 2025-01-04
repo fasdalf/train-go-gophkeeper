@@ -2,6 +2,7 @@
 package dbrepository
 
 import (
+	"context"
 	"database/sql"
 	"errors"
 	"fmt"
@@ -28,13 +29,13 @@ func NewUserDBRepository(dp *dbstorage.DBProxy) *UserDBRepository {
 }
 
 // FindById retrieves a user by their id.
-func (r *UserDBRepository) FindById(id uint64) (*entity.User, error) {
+func (r *UserDBRepository) FindById(ctx context.Context, id uint64) (*entity.User, error) {
 	var user entity.User
-	row := r.dp.Db.QueryRow(r.dp.PrefixQuery(`
+	row := r.dp.Db.QueryRowContext(ctx, r.dp.PrefixQuery(`
         SELECT u.id, u.login, u.pass_hash FROM $prefix$user u
         WHERE u.id = @id
     `), pgx.NamedArgs{"id": id})
-	err := row.Scan(&user.Id, &user.Login, &user.PassHash)
+	err := row.Scan(&user.ID, &user.Login, &user.PassHash)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			err = errors.Join(err, repository.ErrUserNotFound)
@@ -47,13 +48,13 @@ func (r *UserDBRepository) FindById(id uint64) (*entity.User, error) {
 }
 
 // FindByLogin retrieves a user by their login.
-func (r *UserDBRepository) FindByLogin(login string) (*entity.User, error) {
+func (r *UserDBRepository) FindByLogin(ctx context.Context, login string) (*entity.User, error) {
 	var user entity.User
-	row := r.dp.Db.QueryRow(r.dp.PrefixQuery(`
+	row := r.dp.Db.QueryRowContext(ctx, r.dp.PrefixQuery(`
 		SELECT u.id, u.login, u.pass_hash FROM $prefix$user u
 		WHERE u.login = @login
 	`), pgx.NamedArgs{"login": login})
-	err := row.Scan(&user.Id, &user.Login, &user.PassHash)
+	err := row.Scan(&user.ID, &user.Login, &user.PassHash)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			err = errors.Join(repository.ErrUserNotFound, err)
@@ -66,13 +67,13 @@ func (r *UserDBRepository) FindByLogin(login string) (*entity.User, error) {
 }
 
 // Create inserts a new user into the database.
-func (r *UserDBRepository) Create(login, passHash string) (*entity.User, error) {
+func (r *UserDBRepository) Create(ctx context.Context, login, passHash string) (*entity.User, error) {
 	user := entity.User{Login: login, PassHash: passHash}
-	row := r.dp.Db.QueryRow(r.dp.PrefixQuery(`
+	row := r.dp.Db.QueryRowContext(ctx, r.dp.PrefixQuery(`
 		INSERT INTO $prefix$user (login, pass_hash) VALUES (@login, @pass_hash)
 		RETURNING id
 	`), pgx.NamedArgs{"login": login, "pass_hash": passHash})
-	err := row.Scan(&user.Id)
+	err := row.Scan(&user.ID)
 	if err != nil {
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr); pgErr != nil && pgerrcode.IsIntegrityConstraintViolation(pgErr.Code) {
