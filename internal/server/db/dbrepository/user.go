@@ -80,7 +80,7 @@ func (r *UserDBRepository) Create(ctx context.Context, login, passHash string) (
 			err = errors.Join(repository.ErrUserExists, err)
 		}
 
-		return nil, fmt.Errorf("error finding user by Login '%s': %w", login, err)
+		return nil, fmt.Errorf("error creating user with Login '%s': %w", login, err)
 	}
 
 	return &user, nil

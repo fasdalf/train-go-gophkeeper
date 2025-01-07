@@ -1,0 +1,880 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>configfile: Go Coverage Report</title>
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">github.com/fasdalf/train-go-gophkeeper/internal/common/configfile/configfile.go (100.0%)</option>
+				
+				<option value="file1">github.com/fasdalf/train-go-gophkeeper/internal/common/cryptofacade/cryptofacade.go (100.0%)</option>
+				
+				<option value="file2">github.com/fasdalf/train-go-gophkeeper/internal/common/printbuild/printbuild.go (100.0%)</option>
+				
+				<option value="file3">github.com/fasdalf/train-go-gophkeeper/internal/common/utils/localip/localip.go (100.0%)</option>
+				
+				<option value="file4">github.com/fasdalf/train-go-gophkeeper/internal/common/utils/randutils/randutils.go (100.0%)</option>
+				
+				<option value="file5">github.com/fasdalf/train-go-gophkeeper/internal/server/db/dbrepository/secret.go (0.0%)</option>
+				
+				<option value="file6">github.com/fasdalf/train-go-gophkeeper/internal/server/db/dbrepository/user.go (100.0%)</option>
+				
+				<option value="file7">github.com/fasdalf/train-go-gophkeeper/internal/server/db/dbrepository/usermock.go (100.0%)</option>
+				
+				<option value="file8">github.com/fasdalf/train-go-gophkeeper/internal/server/db/storage/dbMigrations.go (100.0%)</option>
+				
+				<option value="file9">github.com/fasdalf/train-go-gophkeeper/internal/server/db/storage/dbStorage.go (100.0%)</option>
+				
+				<option value="file10">github.com/fasdalf/train-go-gophkeeper/internal/server/grpc/controller/type.go (100.0%)</option>
+				
+				<option value="file11">github.com/fasdalf/train-go-gophkeeper/internal/server/grpc/controller/usersignin.go (100.0%)</option>
+				
+				<option value="file12">github.com/fasdalf/train-go-gophkeeper/internal/server/grpc/controller/usersignup.go (100.0%)</option>
+				
+				<option value="file13">github.com/fasdalf/train-go-gophkeeper/internal/server/grpc/interceptors/sloginterceptor.go (100.0%)</option>
+				
+				<option value="file14">github.com/fasdalf/train-go-gophkeeper/internal/server/grpc/interceptors/validatetokeninterceptor.go (100.0%)</option>
+				
+				<option value="file15">github.com/fasdalf/train-go-gophkeeper/internal/server/grpc/server/grpc.go (100.0%)</option>
+				
+				<option value="file16">github.com/fasdalf/train-go-gophkeeper/internal/server/jwt/jwt.go (81.8%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">not covered</span>
+				<span class="cov8">covered</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none">// Package configfile - config file package
+package configfile
+
+import (
+        "encoding/json"
+        "os"
+
+        flag "github.com/spf13/pflag"
+)
+
+const (
+        configEnv      = "CONFIG"
+        configFlag     = "c"
+        configFlagFull = "config"
+)
+
+func init() <span class="cov8" title="1">{
+        var s string
+        flag.StringVarP(&amp;s, configFlagFull, configFlag, "", "Path to config file. Not required.")
+}</span>
+
+func ParseFile(config any) <span class="cov8" title="1">{
+        fn := getConfigFileName()
+        if fn == "" </span><span class="cov8" title="1">{
+                return
+        }</span>
+
+        <span class="cov8" title="1">data, _ := os.ReadFile(fn)
+        json.Unmarshal(data, &amp;config)</span>
+}
+
+func getConfigFileName() (f string) <span class="cov8" title="1">{
+        f = os.Getenv(configEnv)
+        if f != "" </span><span class="cov8" title="1">{
+                return
+        }</span>
+
+        <span class="cov8" title="1">cl := flag.NewFlagSet(configFlagFull, flag.ContinueOnError)
+        cl.StringVarP(&amp;f, configFlagFull, configFlag, f, "")
+        cl.Parse(os.Args[1:])
+        return</span>
+}
+</pre>
+		
+		<pre class="file" id="file1" style="display: none">package cryptofacade
+
+import (
+        "crypto/sha256"
+        "encoding/base64"
+)
+
+// Hash Generates base64-encoded salted SHA256 hash of the password
+func Hash(body, key *string) string <span class="cov8" title="1">{
+        // создаём новый hash.Hash, вычисляющий контрольную сумму SHA-256
+        h := sha256.New()
+        // передаём байты для хеширования
+        h.Write([]byte(*body))
+        // получаем хеш в виде строки
+        return base64.StdEncoding.EncodeToString(h.Sum([]byte(*key)))
+}</span>
+</pre>
+		
+		<pre class="file" id="file2" style="display: none">// Package printbuild - Print Build
+package printbuild
+
+import (
+        "os"
+        "text/template"
+)
+
+type Data struct {
+        BuildVersion string
+        BuildDate    string
+        BuildCommit  string
+}
+
+const Template = `Build version: {{ if .BuildVersion }}{{ .BuildVersion }}{{ else }}N/A{{ end }}
+Build date: {{ if .BuildDate }}{{ .BuildDate }}{{ else }}N/A{{ end }}
+Build commit: {{ if .BuildCommit }}{{ .BuildCommit }}{{ else }}N/A{{ end }} 
+`
+
+func (d *Data) Print() <span class="cov8" title="1">{
+        t := template.Must(template.New("-").Parse(Template))
+
+        _ = t.Execute(os.Stdout, d)
+}</span>
+</pre>
+		
+		<pre class="file" id="file3" style="display: none">package localip
+
+import (
+        "fmt"
+        "net"
+)
+
+func GetLocalIP() (r net.IP) <span class="cov8" title="1">{
+        conn, err := net.Dial("udp", "8.8.8.8:80")
+        r = net.IP{}
+
+        if err == nil </span><span class="cov8" title="1">{
+                defer conn.Close()
+                localAddress := conn.LocalAddr().(*net.UDPAddr)
+                r = localAddress.IP
+        }</span>
+
+        <span class="cov8" title="1">return</span>
+}
+
+// ValidateIPStringInSubnet validates that an ip is valid and belongs given subnet
+func ValidateIPStringInSubnet(addr string, subnet *net.IPNet) error <span class="cov8" title="1">{
+        ip := net.ParseIP(addr)
+        if ip == nil </span><span class="cov8" title="1">{
+                return fmt.Errorf("\"%s\" is not a valid IP address", addr)
+        }</span>
+        <span class="cov8" title="1">if subnet == nil </span><span class="cov8" title="1">{
+                return fmt.Errorf("empty subnet")
+        }</span>
+        <span class="cov8" title="1">if !subnet.Contains(ip) </span><span class="cov8" title="1">{
+                return fmt.Errorf("IP address \"%s\" is not in subnet \"%s\"", addr, subnet.String())
+        }</span>
+        <span class="cov8" title="1">return nil</span>
+}
+
+// GetFreePort asks the kernel for a free open port that is ready to use.
+func GetFreePort() (port int, err error) <span class="cov8" title="1">{
+        var l net.Listener
+        if l, err = net.Listen("tcp", "localhost:0"); err == nil </span><span class="cov8" title="1">{
+                defer l.Close()
+                port = l.Addr().(*net.TCPAddr).Port
+        }</span>
+        <span class="cov8" title="1">return</span>
+}
+</pre>
+		
+		<pre class="file" id="file4" style="display: none">package randutils
+
+import "math/rand"
+
+const (
+        aInt  = int('a')
+        azInt = int(byte('z') - byte('a'))
+)
+
+// RandomString generates a random string of a given length.
+func RandomString(length int) string <span class="cov8" title="1">{
+        ran_str := make([]byte, length)
+        for i := 0; i &lt; length; i++ </span><span class="cov8" title="1">{
+                ran_str[i] = byte(aInt + rand.Intn(azInt))
+        }</span>
+        <span class="cov8" title="1">return string(ran_str)</span>
+}
+</pre>
+		
+		<pre class="file" id="file5" style="display: none">// Package dbrepository - DB repository, secrets file
+package dbrepository
+
+import (
+        dbstorage "github.com/fasdalf/train-go-gophkeeper/internal/server/db/storage"
+        "github.com/fasdalf/train-go-gophkeeper/internal/server/model/entity"
+        "github.com/fasdalf/train-go-gophkeeper/internal/server/model/repository"
+)
+
+var typeCheckSecretDBRepository repository.SecretRepository = &amp;SecretDBRepository{}
+
+type SecretDBRepository struct {
+        dp *dbstorage.DBProxy
+        // TODO: ##@@ implement methods
+}
+
+// NewSecretDBRepository init
+func NewSecretDBRepository(dp *dbstorage.DBProxy) *SecretDBRepository <span class="cov0" title="0">{
+        return &amp;SecretDBRepository{
+                dp: dp,
+        }
+}</span>
+
+func (r *SecretDBRepository) FindById(Id uint64) (*entity.Secret, error) <span class="cov0" title="0">{
+        return nil, nil
+}</span>
+func (r *SecretDBRepository) FindAfter(UserId uint64, UpdatedAt uint64) ([]*entity.Secret, error) <span class="cov0" title="0">{
+
+        // TODO: ##@@ #cleanup
+        // ##@@ for multiple results use internal/common/metricstorage/dbStorage.go:160
+        //for rows.Next() {
+        //        var k string
+        //        if err = rows.Scan(&amp;k); err != nil {
+        //                return nil, err
+        //        }
+        //        keys = append(keys, k)
+        //}
+        //
+        //if err = rows.Err(); err != nil {
+        //        return nil, err
+        //}
+
+        return nil, nil
+}</span>
+func (r *SecretDBRepository) Create(UserId uint64, Data []byte) (*entity.Secret, error) <span class="cov0" title="0">{
+        return nil, nil
+}</span>
+func (r *SecretDBRepository) Update(Id uint64, Data []byte, OldUpdatedAt uint64) (*entity.Secret, error) <span class="cov0" title="0">{
+        return nil, nil
+}</span>
+func (r *SecretDBRepository) Delete(Id uint64, OldUpdatedAt uint64) (*entity.Secret, error) <span class="cov0" title="0">{
+        return nil, nil
+}</span>
+</pre>
+		
+		<pre class="file" id="file6" style="display: none">// Package dbrepository - DB repository, users file
+package dbrepository
+
+import (
+        "context"
+        "database/sql"
+        "errors"
+        "fmt"
+        dbstorage "github.com/fasdalf/train-go-gophkeeper/internal/server/db/storage"
+        "github.com/fasdalf/train-go-gophkeeper/internal/server/model/entity"
+        "github.com/fasdalf/train-go-gophkeeper/internal/server/model/repository"
+        "github.com/jackc/pgerrcode"
+        "github.com/jackc/pgx/v5"
+        "github.com/jackc/pgx/v5/pgconn"
+)
+
+// typeCheckUserDBRepository ensures that UserDBRepository implements the UserRepository interface.
+var typeCheckUserDBRepository repository.UserRepository = &amp;UserDBRepository{}
+
+type UserDBRepository struct {
+        dp *dbstorage.DBProxy
+}
+
+// NewUserDBRepository init
+func NewUserDBRepository(dp *dbstorage.DBProxy) *UserDBRepository <span class="cov8" title="1">{
+        return &amp;UserDBRepository{
+                dp: dp,
+        }
+}</span>
+
+// FindById retrieves a user by their id.
+func (r *UserDBRepository) FindById(ctx context.Context, id uint64) (*entity.User, error) <span class="cov8" title="1">{
+        var user entity.User
+        row := r.dp.Db.QueryRowContext(ctx, r.dp.PrefixQuery(`
+        SELECT u.id, u.login, u.pass_hash FROM $prefix$user u
+        WHERE u.id = @id
+    `), pgx.NamedArgs{"id": id})
+        err := row.Scan(&amp;user.ID, &amp;user.Login, &amp;user.PassHash)
+        if err != nil </span><span class="cov8" title="1">{
+                if errors.Is(err, sql.ErrNoRows) </span><span class="cov8" title="1">{
+                        err = errors.Join(err, repository.ErrUserNotFound)
+                }</span>
+
+                <span class="cov8" title="1">return nil, fmt.Errorf("error finding user by ID '%d': %w", id, err)</span>
+        }
+
+        <span class="cov8" title="1">return &amp;user, nil</span>
+}
+
+// FindByLogin retrieves a user by their login.
+func (r *UserDBRepository) FindByLogin(ctx context.Context, login string) (*entity.User, error) <span class="cov8" title="1">{
+        var user entity.User
+        row := r.dp.Db.QueryRowContext(ctx, r.dp.PrefixQuery(`
+                SELECT u.id, u.login, u.pass_hash FROM $prefix$user u
+                WHERE u.login = @login
+        `), pgx.NamedArgs{"login": login})
+        err := row.Scan(&amp;user.ID, &amp;user.Login, &amp;user.PassHash)
+        if err != nil </span><span class="cov8" title="1">{
+                if errors.Is(err, sql.ErrNoRows) </span><span class="cov8" title="1">{
+                        err = errors.Join(repository.ErrUserNotFound, err)
+                }</span>
+
+                <span class="cov8" title="1">return nil, fmt.Errorf("error finding user by Login '%s': %w", login, err)</span>
+        }
+
+        <span class="cov8" title="1">return &amp;user, nil</span>
+}
+
+// Create inserts a new user into the database.
+func (r *UserDBRepository) Create(ctx context.Context, login, passHash string) (*entity.User, error) <span class="cov8" title="1">{
+        user := entity.User{Login: login, PassHash: passHash}
+        row := r.dp.Db.QueryRowContext(ctx, r.dp.PrefixQuery(`
+                INSERT INTO $prefix$user (login, pass_hash) VALUES (@login, @pass_hash)
+                RETURNING id
+        `), pgx.NamedArgs{"login": login, "pass_hash": passHash})
+        err := row.Scan(&amp;user.ID)
+        if err != nil </span><span class="cov8" title="1">{
+                var pgErr *pgconn.PgError
+                if errors.As(err, &amp;pgErr); pgErr != nil &amp;&amp; pgerrcode.IsIntegrityConstraintViolation(pgErr.Code) </span><span class="cov8" title="1">{
+                        err = errors.Join(repository.ErrUserExists, err)
+                }</span>
+
+                <span class="cov8" title="1">return nil, fmt.Errorf("error creating user with Login '%s': %w", login, err)</span>
+        }
+
+        <span class="cov8" title="1">return &amp;user, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file7" style="display: none">// Package dbrepository - DB repository, users file
+package dbrepository
+
+import (
+        "context"
+        "github.com/fasdalf/train-go-gophkeeper/internal/server/model/entity"
+        "github.com/fasdalf/train-go-gophkeeper/internal/server/model/repository"
+)
+
+// typeCheckUserMockRepository ensures that UserDBRepository implements the UserRepository interface.
+var typeCheckUserMockRepository repository.UserRepository = &amp;UserMockRepository{}
+
+type UserMockRepository struct {
+        User  *entity.User
+        Error error
+}
+
+// FindById retrieves a user by their id.
+func (r *UserMockRepository) FindById(ctx context.Context, id uint64) (*entity.User, error) <span class="cov8" title="1">{
+        return r.User, r.Error
+}</span>
+
+// FindByLogin retrieves a user by their login.
+func (r *UserMockRepository) FindByLogin(ctx context.Context, login string) (*entity.User, error) <span class="cov8" title="1">{
+        return r.User, r.Error
+}</span>
+
+// Create inserts a new user into the database.
+func (r *UserMockRepository) Create(ctx context.Context, login, passHash string) (*entity.User, error) <span class="cov8" title="1">{
+        return r.User, r.Error
+}</span>
+</pre>
+		
+		<pre class="file" id="file8" style="display: none">// Package dbstorage - DB storage
+package dbstorage
+
+import (
+        "context"
+        "fmt"
+        _ "github.com/jackc/pgx/v5/stdlib"
+)
+
+// Bootstrap подготавливает БД к работе, создавая необходимые таблицы и индексы
+func (s *DBProxy) Bootstrap(ctx context.Context) error <span class="cov8" title="1">{
+        migrations := []string{
+                // Пользователи
+                `
+                CREATE TABLE IF NOT EXISTS "$prefix$user" (
+                        id bigserial NOT NULL,
+                        login varchar(250) NOT NULL,
+                        pass_hash varchar(250) NOT NULL,
+                        CONSTRAINT "$prefix$user_pk" PRIMARY KEY (id),
+                        CONSTRAINT "$prefix$user_login_udx" UNIQUE (login)
+                );`,
+                // Пароли
+                `
+                CREATE TABLE IF NOT EXISTS "$prefix$secret" (
+                        id bigserial NOT NULL,
+                        user_id bigint NULL,
+                        updated_at bigint NOT NULL,
+                        is_deleted boolean NOT NULL DEFAULT FALSE,
+                        data bytea NOT NULL,
+                        CONSTRAINT "$prefix$secret_pk" PRIMARY KEY (id),
+                        CONSTRAINT "$prefix$secret_user_fk" FOREIGN KEY (user_id) REFERENCES "$prefix$user" (id)                    
+                );`,
+        }
+
+        return s.runMigrations(ctx, migrations)
+}</span>
+
+// Teardown Удаляет таблицы из БД
+func (s *DBProxy) Teardown(ctx context.Context) error <span class="cov8" title="1">{
+        migrations := []string{
+                // Пароли
+                `DROP TABLE IF EXISTS "$prefix$secret"`,
+                // Пользователи
+                `DROP TABLE IF EXISTS "$prefix$user"`,
+        }
+
+        return s.runMigrations(ctx, migrations)
+}</span>
+
+func (s *DBProxy) runMigrations(ctx context.Context, migrations []string) error <span class="cov8" title="1">{
+        // запускаем транзакцию
+        tx, err := s.Db.BeginTx(ctx, nil)
+        if err != nil </span><span class="cov8" title="1">{
+                return err
+        }</span>
+
+        <span class="cov8" title="1">for _, migration := range migrations </span><span class="cov8" title="1">{
+                query := s.PrefixQuery(migration)
+
+                if _, err = tx.ExecContext(ctx, query); err != nil </span><span class="cov8" title="1">{
+                        // откатываем транзакцию в случае ошибки
+                        _ = tx.Rollback()
+                        return fmt.Errorf("query execution error %w with query \"%s\"", err, query)
+                }</span>
+        }
+
+        // коммитим транзакцию
+        <span class="cov8" title="1">return tx.Commit()</span>
+}
+</pre>
+		
+		<pre class="file" id="file9" style="display: none">// Package dbstorage - DB storage
+package dbstorage
+
+import (
+        "context"
+        "database/sql"
+        "fmt"
+        _ "github.com/jackc/pgx/v5/stdlib"
+        "math/rand"
+        "os"
+        "strings"
+)
+
+const (
+        TablePrefix         = "$prefix$"
+        testDBDSNENVKey     = "DATABASE_URI_TEST"
+        testDBDSNENVDefault = "host=train-go-gophkeeper_db user=postgres password=postgresP@SS dbname=postgres_gophkeeper sslmode=disable"
+)
+
+// DBProxy store metrics in DB
+type DBProxy struct {
+        Db     *sql.DB
+        Prefix string
+}
+
+func NewDBStorage(ctx context.Context, dsn string, prefix string) (s *DBProxy, err error) <span class="cov8" title="1">{
+        // err is possible only when no driver imported
+        db, _ := sql.Open("pgx", dsn)
+        s = &amp;DBProxy{
+                Db:     db,
+                Prefix: prefix,
+        }
+
+        // IRL it should be done in main() with separate command line flag.
+        if err = s.Bootstrap(ctx); err != nil </span><span class="cov8" title="1">{
+                return nil, fmt.Errorf("failed to bootstrap database: %w", err)
+        }</span>
+
+        <span class="cov8" title="1">return s, nil</span>
+}
+
+// NewTestDbStorage creates new DBProxy with random prefix for parallel tests run.
+func NewTestDbStorage() (s *DBProxy, err error) <span class="cov8" title="1">{
+        dsn := testDBDSNENVDefault
+        envDSN := os.Getenv(testDBDSNENVKey)
+        if envDSN != "" </span><span class="cov8" title="1">{
+                dsn = envDSN
+        }</span>
+
+        <span class="cov8" title="1">return NewDBStorage(context.Background(), dsn, fmt.Sprintf("go_test_%06d_", rand.Intn(999998)+1))</span>
+}
+
+// PrefixQuery adds prefix to table name where TablePrefix used
+func (s *DBProxy) PrefixQuery(query string) string <span class="cov8" title="1">{
+        query = strings.ReplaceAll(query, TablePrefix, s.Prefix)
+        return query
+}</span>
+</pre>
+		
+		<pre class="file" id="file10" style="display: none">package controller
+
+import (
+        pb "github.com/fasdalf/train-go-gophkeeper/internal/common/proto/gophkeeperserver"
+        "github.com/fasdalf/train-go-gophkeeper/internal/server/model/repository"
+        "time"
+)
+
+// GophKeeperServer поддерживает все необходимые методы сервера.
+type GophKeeperServer struct {
+        // нужно встраивать тип pb.Unimplemented&lt;TypeName&gt;
+        // для совместимости с будущими версиями
+        pb.UnimplementedGophKeeperServer
+        userRepo   repository.UserRepository
+        key        *string
+        exp        time.Duration
+        secretRepo repository.SecretRepository
+}
+
+func NewGophKeeperServer(
+        userRepo repository.UserRepository,
+        key *string,
+        exp time.Duration,
+        secretRepo repository.SecretRepository,
+) *GophKeeperServer <span class="cov8" title="1">{
+        return &amp;GophKeeperServer{
+                UnimplementedGophKeeperServer: pb.UnimplementedGophKeeperServer{},
+                userRepo:                      userRepo,
+                key:                           key,
+                exp:                           exp,
+                secretRepo:                    secretRepo,
+        }
+}</span>
+</pre>
+		
+		<pre class="file" id="file11" style="display: none">package controller
+
+import (
+        "context"
+        "errors"
+        "fmt"
+        "github.com/fasdalf/train-go-gophkeeper/internal/common/cryptofacade"
+        "github.com/fasdalf/train-go-gophkeeper/internal/server/jwt"
+        "log/slog"
+
+        "google.golang.org/grpc/codes"
+        "google.golang.org/grpc/status"
+
+        pb "github.com/fasdalf/train-go-gophkeeper/internal/common/proto/gophkeeperserver"
+)
+
+func (s *GophKeeperServer) UserSignIn(ctx context.Context, r *pb.UserSignInRequest) (*pb.UserSignInResponse, error) <span class="cov8" title="1">{
+        if r == nil || r.Login == "" || r.Password == "" </span><span class="cov8" title="1">{
+                return nil, errors.New("login and password must be not empty")
+        }</span>
+
+        // IRL use "golang.org/x/crypto/bcrypt" GenerateFromPassword() + CompareHashAndPassword()
+        // https://medium.com/@rnp0728/secure-password-hashing-in-go-a-comprehensive-guide-5500e19e7c1f
+        <span class="cov8" title="1">passHash := cryptofacade.Hash(&amp;r.Password, s.key)
+        user, err := s.userRepo.FindByLogin(ctx, r.Login)
+        if err != nil || user.PassHash != passHash </span><span class="cov8" title="1">{
+                if user != nil &amp;&amp; user.PassHash != passHash </span><span class="cov8" title="1">{
+                        err = fmt.Errorf("password mismatch")
+                }</span>
+                <span class="cov8" title="1">slog.Error("failed to sign in user", "err", err)
+                gErr := status.Errorf(codes.Internal, "failed to sign in user, see server logs")
+
+                return nil, gErr</span>
+        }
+
+        <span class="cov8" title="1">token := jwt.BuildJWTString(user.ID, s.key, s.exp)
+        return &amp;pb.UserSignInResponse{Token: token}, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file12" style="display: none">package controller
+
+import (
+        "context"
+        "errors"
+        "github.com/fasdalf/train-go-gophkeeper/internal/common/cryptofacade"
+        "github.com/fasdalf/train-go-gophkeeper/internal/server/jwt"
+        "github.com/fasdalf/train-go-gophkeeper/internal/server/model/repository"
+        "log/slog"
+
+        "google.golang.org/grpc/codes"
+        "google.golang.org/grpc/status"
+
+        pb "github.com/fasdalf/train-go-gophkeeper/internal/common/proto/gophkeeperserver"
+)
+
+func (s *GophKeeperServer) UserSignUp(ctx context.Context, r *pb.UserSignUpRequest) (*pb.UserSignUpResponse, error) <span class="cov8" title="1">{
+        if r == nil || r.Login == "" || r.Password == "" </span><span class="cov8" title="1">{
+                return nil, errors.New("login and password must be not empty")
+        }</span>
+
+        // IRL use "golang.org/x/crypto/bcrypt" GenerateFromPassword() + CompareHashAndPassword()
+        // https://medium.com/@rnp0728/secure-password-hashing-in-go-a-comprehensive-guide-5500e19e7c1f
+        <span class="cov8" title="1">passHash := cryptofacade.Hash(&amp;r.Password, s.key)
+        user, err := s.userRepo.Create(ctx, r.Login, passHash)
+        if err != nil </span><span class="cov8" title="1">{
+                slog.Error("failed to create user", "err", err)
+                gErr := status.Errorf(codes.Internal, "failed to create user, see server logs")
+                if errors.Is(err, repository.ErrUserExists) </span><span class="cov8" title="1">{
+                        gErr = status.Errorf(codes.AlreadyExists, "failed to create user: %v", err)
+                }</span>
+
+                <span class="cov8" title="1">return nil, gErr</span>
+        }
+
+        <span class="cov8" title="1">token := jwt.BuildJWTString(user.ID, s.key, s.exp)
+        return &amp;pb.UserSignUpResponse{Token: token}, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file13" style="display: none">package interceptors
+
+import (
+        "context"
+        "log/slog"
+
+        "google.golang.org/grpc"
+
+        "github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging"
+)
+
+func NewSlogInterceptor() grpc.UnaryServerInterceptor <span class="cov8" title="1">{
+        opts := []logging.Option{
+                logging.WithLogOnEvents(logging.StartCall, logging.FinishCall),
+                // Add any other option (check functions starting with logging.With).
+        }
+        slogger := logging.LoggerFunc(func(ctx context.Context, lvl logging.Level, msg string, fields ...any) </span><span class="cov8" title="1">{
+                slog.Default().Log(ctx, slog.Level(lvl), msg, fields...)
+        }</span>)
+        <span class="cov8" title="1">return logging.UnaryServerInterceptor(slogger, opts...)</span>
+}
+</pre>
+		
+		<pre class="file" id="file14" style="display: none">package interceptors
+
+import (
+        "context"
+        "fmt"
+        "log/slog"
+        "strings"
+
+        "google.golang.org/grpc"
+        "google.golang.org/grpc/codes"
+        "google.golang.org/grpc/metadata"
+        "google.golang.org/grpc/status"
+
+        "github.com/fasdalf/train-go-gophkeeper/internal/server/jwt"
+)
+
+const (
+        methodPrefix = "/gophkeeperserver.GophKeeper/User"
+)
+
+var (
+        userIdKey = struct{}{}
+)
+
+func NewValidateTokenInterceptor(key *string) grpc.UnaryServerInterceptor <span class="cov8" title="1">{
+        return func(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp any, err error) </span><span class="cov8" title="1">{
+                if !strings.HasPrefix(info.FullMethod, methodPrefix) </span><span class="cov8" title="1">{
+                        token := strings.TrimPrefix(getFirstMd(ctx, jwt.AuthHeader), jwt.AuthPrefix)
+                        userID, err := jwt.GetUserID(&amp;token, key)
+                        if err != nil </span><span class="cov8" title="1">{
+                                slog.Error("token is empty or invalid", "token", token)
+                                msg := fmt.Sprintf("%s token is empty or invalid: %s", jwt.AuthHeader, token)
+                                return nil, status.Error(codes.Unauthenticated, msg)
+                        }</span>
+                        <span class="cov8" title="1">ctx = context.WithValue(ctx, userIdKey, userID)</span>
+                }
+                <span class="cov8" title="1">return handler(ctx, req)</span>
+        }
+}
+
+// getFirstMd silently gets first metadata value as string
+func getFirstMd(ctx context.Context, key string) (s string) <span class="cov8" title="1">{
+        values := metadata.ValueFromIncomingContext(ctx, key)
+        if len(values) &gt; 0 </span><span class="cov8" title="1">{
+                s = values[0]
+        }</span>
+        <span class="cov8" title="1">return</span>
+}
+</pre>
+		
+		<pre class="file" id="file15" style="display: none">package grpcserver
+
+import (
+        "github.com/fasdalf/train-go-gophkeeper/internal/server/model/repository"
+        "net"
+        "time"
+
+        "github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/recovery"
+        "google.golang.org/grpc"
+        _ "google.golang.org/grpc/encoding/gzip"
+
+        pb "github.com/fasdalf/train-go-gophkeeper/internal/common/proto/gophkeeperserver"
+        gc "github.com/fasdalf/train-go-gophkeeper/internal/server/grpc/controller"
+        "github.com/fasdalf/train-go-gophkeeper/internal/server/grpc/interceptors"
+)
+
+func NewGrpcServer(
+        userRepo repository.UserRepository,
+        key *string,
+        exp time.Duration,
+        secretRepo repository.SecretRepository,
+) *grpc.Server <span class="cov8" title="1">{
+        options := []grpc.ServerOption{
+                grpc.ChainUnaryInterceptor(interceptors.NewSlogInterceptor()),
+                grpc.ChainUnaryInterceptor(recovery.UnaryServerInterceptor()),
+                grpc.ChainUnaryInterceptor(interceptors.NewValidateTokenInterceptor(key)),
+                // TODO: Add separate nginx/ingress/etc reverse proxy with SSL above this one.
+        }
+        s := grpc.NewServer(options...)
+        mServer := gc.NewGophKeeperServer(userRepo, key, exp, secretRepo)
+        pb.RegisterGophKeeperServer(s, mServer)
+
+        return s
+}</span>
+
+// ListenAndServe intended to use with errgroup.
+func ListenAndServe(server *grpc.Server, addr string) error <span class="cov8" title="1">{
+        listen, err := net.Listen("tcp", addr)
+        if err != nil </span><span class="cov8" title="1">{
+                return err
+        }</span>
+        <span class="cov8" title="1">if err = server.Serve(listen); err != nil </span><span class="cov8" title="1">{
+                return err
+        }</span>
+        <span class="cov8" title="1">return nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file16" style="display: none">package jwt
+
+import (
+        "fmt"
+        jwt "github.com/golang-jwt/jwt/v4"
+        "time"
+)
+
+type Claims struct {
+        jwt.RegisteredClaims
+        UserID uint64
+}
+
+const (
+        AuthHeader = "Authorization"
+        AuthPrefix = "Bearer "
+)
+
+// BuildJWTString создаёт токен и возвращает его в виде строки
+func BuildJWTString(id uint64, key *string, exp time.Duration) string <span class="cov8" title="1">{
+        token := jwt.NewWithClaims(jwt.SigningMethodHS256, Claims{
+                RegisteredClaims: jwt.RegisteredClaims{
+                        // когда истекает токен
+                        ExpiresAt: jwt.NewNumericDate(time.Now().Add(exp)),
+                },
+                // собственное утверждение
+                UserID: id,
+        })
+
+        tokenString, _ := token.SignedString([]byte(*key))
+
+        return tokenString
+}</span>
+
+// GetUserID валидирует токен и возвращает ID пользователя
+func GetUserID(tokenString, key *string) (uint64, error) <span class="cov8" title="1">{
+        claims := &amp;Claims{}
+        _, err := jwt.ParseWithClaims(*tokenString, claims, func(t *jwt.Token) (interface{}, error) </span><span class="cov8" title="1">{
+                if t.Method != jwt.SigningMethodHS256 </span><span class="cov0" title="0">{
+                        return nil, fmt.Errorf("unexpected signing method: %v", t.Method.Alg())
+                }</span>
+                <span class="cov8" title="1">return []byte(*key), nil</span>
+        })
+        <span class="cov8" title="1">if err != nil </span><span class="cov0" title="0">{
+                return 0, err
+        }</span>
+
+        <span class="cov8" title="1">return claims.UserID, nil</span>
+}
+</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+</html>

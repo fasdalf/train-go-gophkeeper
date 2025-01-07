@@ -17,7 +17,7 @@ const (
 )
 
 // BuildJWTString создаёт токен и возвращает его в виде строки
-func BuildJWTString(id uint64, key *string, exp time.Duration) (string, error) {
+func BuildJWTString(id uint64, key *string, exp time.Duration) string {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, Claims{
 		RegisteredClaims: jwt.RegisteredClaims{
 			// когда истекает токен
@@ -27,12 +27,9 @@ func BuildJWTString(id uint64, key *string, exp time.Duration) (string, error) {
 		UserID: id,
 	})
 
-	tokenString, err := token.SignedString([]byte(*key))
-	if err != nil {
-		return "", err
-	}
+	tokenString, _ := token.SignedString([]byte(*key))
 
-	return tokenString, nil
+	return tokenString
 }
 
 // GetUserID валидирует токен и возвращает ID пользователя

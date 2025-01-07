@@ -25,6 +25,7 @@ func (s *DBProxy) Bootstrap(ctx context.Context) error {
 			id bigserial NOT NULL,
 			user_id bigint NULL,
 			updated_at bigint NOT NULL,
+			is_deleted boolean NOT NULL DEFAULT FALSE,
 			data bytea NOT NULL,
 			CONSTRAINT "$prefix$secret_pk" PRIMARY KEY (id),
 			CONSTRAINT "$prefix$secret_user_fk" FOREIGN KEY (user_id) REFERENCES "$prefix$user" (id)		    

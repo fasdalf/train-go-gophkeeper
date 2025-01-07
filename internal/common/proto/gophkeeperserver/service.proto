@@ -17,7 +17,7 @@ service GophKeeper {
 message UserSignUpRequest {
   string login = 1;
   string password = 2;
-  bytes key = 3;
+  bytes key = 3; // Improvement: could be stored on server to allow users change passwords
 }
 
 message UserSignUpResponse {

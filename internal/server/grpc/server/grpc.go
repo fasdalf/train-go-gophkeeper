@@ -23,16 +23,8 @@ func NewGrpcServer(
 	options := []grpc.ServerOption{
 		grpc.ChainUnaryInterceptor(interceptors.NewSlogInterceptor()),
 		grpc.ChainUnaryInterceptor(recovery.UnaryServerInterceptor()),
-		// TODO: ##@@ add auth interceptor and throw all bellow away
-		// IRL use github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/realip
-		// or at least peer.FromContext(ctx).Addr
-		//grpc.ChainUnaryInterceptor(interceptors.NewValidateIPInterceptor(tr)),
-		//grpc.ChainUnaryInterceptor(interceptors.NewDecryptBodyInterceptor(decryptionKey)),
-		//grpc.ChainUnaryInterceptor(interceptors.NewValidateHashInterceptor(key)),
-		//grpc.ChainUnaryInterceptor(interceptors.NewRespondWithHashInterceptor(key)),
-		//// TODO: ##@@ add gzip+rsa home-made compressor and validate metadata for "grpc-accept-encoding": ["gziprsa"]
-		//// This one grpc.ForceServerCodecV2(),
-		//// or use interceptor with decrypt from message body
+		grpc.ChainUnaryInterceptor(interceptors.NewValidateTokenInterceptor(key)),
+		// TODO: Add separate nginx/ingress/etc reverse proxy with SSL above this one.
 	}
 	s := grpc.NewServer(options...)
 	mServer := gc.NewGophKeeperServer(userRepo, key, exp, secretRepo)

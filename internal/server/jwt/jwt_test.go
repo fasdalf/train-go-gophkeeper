@@ -10,10 +10,7 @@ func Example() {
 	key := "mock key"
 	exp := 3 * time.Hour
 
-	gotToken, err := BuildJWTString(startID, &key, exp)
-	if err != nil {
-		fmt.Println(err)
-	}
+	gotToken := BuildJWTString(startID, &key, exp)
 
 	gotID, err := GetUserID(&gotToken, &key)
 	if err != nil {
