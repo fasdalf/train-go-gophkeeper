@@ -13,12 +13,8 @@ import (
 )
 
 func (s *GophKeeperServer) ListSecrets(ctx context.Context, r *pb.ListSecretsRequest) (*pb.ListSecretsResponse, error) {
+	// Protected with NewValidateTokenInterceptor()
 	userID := ctx.Value(contextkeys.UserIDKey).(int64)
-	if userID == 0 {
-		slog.Error("user is not loaded")
-		gErr := status.Errorf(codes.Internal, "user is not loaded")
-		return nil, gErr
-	}
 	syncTs := time.Now().UnixNano()
 	fromTs := int64(0)
 	if r != nil {
