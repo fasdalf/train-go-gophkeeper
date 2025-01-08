@@ -65,29 +65,33 @@
 				
 				<option value="file4">github.com/fasdalf/train-go-gophkeeper/internal/common/utils/randutils/randutils.go (100.0%)</option>
 				
-				<option value="file5">github.com/fasdalf/train-go-gophkeeper/internal/server/db/dbrepository/secret.go (0.0%)</option>
+				<option value="file5">github.com/fasdalf/train-go-gophkeeper/internal/server/db/dbrepository/secret.go (91.7%)</option>
 				
-				<option value="file6">github.com/fasdalf/train-go-gophkeeper/internal/server/db/dbrepository/user.go (100.0%)</option>
+				<option value="file6">github.com/fasdalf/train-go-gophkeeper/internal/server/db/dbrepository/secretmock.go (100.0%)</option>
 				
-				<option value="file7">github.com/fasdalf/train-go-gophkeeper/internal/server/db/dbrepository/usermock.go (100.0%)</option>
+				<option value="file7">github.com/fasdalf/train-go-gophkeeper/internal/server/db/dbrepository/user.go (100.0%)</option>
 				
-				<option value="file8">github.com/fasdalf/train-go-gophkeeper/internal/server/db/storage/dbMigrations.go (100.0%)</option>
+				<option value="file8">github.com/fasdalf/train-go-gophkeeper/internal/server/db/dbrepository/usermock.go (100.0%)</option>
 				
-				<option value="file9">github.com/fasdalf/train-go-gophkeeper/internal/server/db/storage/dbStorage.go (100.0%)</option>
+				<option value="file9">github.com/fasdalf/train-go-gophkeeper/internal/server/db/storage/dbMigrations.go (100.0%)</option>
 				
-				<option value="file10">github.com/fasdalf/train-go-gophkeeper/internal/server/grpc/controller/type.go (100.0%)</option>
+				<option value="file10">github.com/fasdalf/train-go-gophkeeper/internal/server/db/storage/dbStorage.go (100.0%)</option>
 				
-				<option value="file11">github.com/fasdalf/train-go-gophkeeper/internal/server/grpc/controller/usersignin.go (100.0%)</option>
+				<option value="file11">github.com/fasdalf/train-go-gophkeeper/internal/server/grpc/controller/listsecrets.go (0.0%)</option>
 				
-				<option value="file12">github.com/fasdalf/train-go-gophkeeper/internal/server/grpc/controller/usersignup.go (100.0%)</option>
+				<option value="file12">github.com/fasdalf/train-go-gophkeeper/internal/server/grpc/controller/type.go (100.0%)</option>
 				
-				<option value="file13">github.com/fasdalf/train-go-gophkeeper/internal/server/grpc/interceptors/sloginterceptor.go (100.0%)</option>
+				<option value="file13">github.com/fasdalf/train-go-gophkeeper/internal/server/grpc/controller/usersignin.go (100.0%)</option>
 				
-				<option value="file14">github.com/fasdalf/train-go-gophkeeper/internal/server/grpc/interceptors/validatetokeninterceptor.go (100.0%)</option>
+				<option value="file14">github.com/fasdalf/train-go-gophkeeper/internal/server/grpc/controller/usersignup.go (100.0%)</option>
 				
-				<option value="file15">github.com/fasdalf/train-go-gophkeeper/internal/server/grpc/server/grpc.go (100.0%)</option>
+				<option value="file15">github.com/fasdalf/train-go-gophkeeper/internal/server/grpc/interceptors/sloginterceptor.go (100.0%)</option>
 				
-				<option value="file16">github.com/fasdalf/train-go-gophkeeper/internal/server/jwt/jwt.go (81.8%)</option>
+				<option value="file16">github.com/fasdalf/train-go-gophkeeper/internal/server/grpc/interceptors/validatetokeninterceptor.go (100.0%)</option>
+				
+				<option value="file17">github.com/fasdalf/train-go-gophkeeper/internal/server/grpc/server/grpc.go (100.0%)</option>
+				
+				<option value="file18">github.com/fasdalf/train-go-gophkeeper/internal/server/jwt/jwt.go (81.8%)</option>
 				
 				</select>
 			</div>
@@ -258,6 +262,14 @@ func RandomString(length int) string <span class="cov8" title="1">{
 package dbrepository
 
 import (
+        "context"
+        "database/sql"
+        "errors"
+        "fmt"
+        "time"
+
+        "github.com/jackc/pgx/v5"
+
         dbstorage "github.com/fasdalf/train-go-gophkeeper/internal/server/db/storage"
         "github.com/fasdalf/train-go-gophkeeper/internal/server/model/entity"
         "github.com/fasdalf/train-go-gophkeeper/internal/server/model/repository"
@@ -267,49 +279,187 @@ var typeCheckSecretDBRepository repository.SecretRepository = &amp;SecretDBRepos
 
 type SecretDBRepository struct {
         dp *dbstorage.DBProxy
-        // TODO: ##@@ implement methods
 }
 
 // NewSecretDBRepository init
-func NewSecretDBRepository(dp *dbstorage.DBProxy) *SecretDBRepository <span class="cov0" title="0">{
+func NewSecretDBRepository(dp *dbstorage.DBProxy) *SecretDBRepository <span class="cov8" title="1">{
         return &amp;SecretDBRepository{
                 dp: dp,
         }
 }</span>
 
-func (r *SecretDBRepository) FindById(Id uint64) (*entity.Secret, error) <span class="cov0" title="0">{
-        return nil, nil
-}</span>
-func (r *SecretDBRepository) FindAfter(UserId uint64, UpdatedAt uint64) ([]*entity.Secret, error) <span class="cov0" title="0">{
+func (r *SecretDBRepository) FindById(ctx context.Context, id int64) (*entity.Secret, error) <span class="cov8" title="1">{
+        row := r.dp.Db.QueryRowContext(ctx, r.dp.PrefixQuery(`
+        SELECT s.id, s.user_id, s.updated_at, s.is_deleted, s.data FROM $prefix$secret s
+        WHERE s.id = @id
+    `), pgx.NamedArgs{"id": id})
+        s, err := r.scanSecret(row)
+        if err != nil </span><span class="cov8" title="1">{
+                if errors.Is(err, sql.ErrNoRows) </span><span class="cov8" title="1">{
+                        err = errors.Join(repository.ErrSecretNotFound, err)
+                }</span>
 
-        // TODO: ##@@ #cleanup
-        // ##@@ for multiple results use internal/common/metricstorage/dbStorage.go:160
-        //for rows.Next() {
-        //        var k string
-        //        if err = rows.Scan(&amp;k); err != nil {
-        //                return nil, err
-        //        }
-        //        keys = append(keys, k)
-        //}
-        //
-        //if err = rows.Err(); err != nil {
-        //        return nil, err
-        //}
+                <span class="cov8" title="1">return nil, fmt.Errorf("error finding secret by id '%d': %w", id, err)</span>
+        }
 
-        return nil, nil
+        <span class="cov8" title="1">return s, nil</span>
+}
+func (r *SecretDBRepository) FindAfter(ctx context.Context, userId int64, updatedAt int64) ([]*entity.Secret, error) <span class="cov8" title="1">{
+        rows, err := r.dp.Db.QueryContext(ctx, r.dp.PrefixQuery(`
+        SELECT s.id, s.user_id, s.updated_at, s.is_deleted, s.data FROM $prefix$secret s
+        WHERE s.user_id = @id AND s.updated_at &gt; @updatedAt
+    `), pgx.NamedArgs{"id": userId, "updatedAt": updatedAt})
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+        <span class="cov8" title="1">defer rows.Close()
+
+        results := []*entity.Secret{}
+        for rows.Next() </span><span class="cov8" title="1">{
+                s, err := r.scanSecret(rows)
+                if err != nil </span><span class="cov0" title="0">{
+                        return nil, fmt.Errorf("failed to fetch secrets: %w", err)
+                }</span>
+                <span class="cov8" title="1">results = append(results, s)</span>
+        }
+        <span class="cov8" title="1">err = rows.Err()
+
+        return results, err</span>
+}
+
+func (r *SecretDBRepository) Create(ctx context.Context, userId int64, data []byte) (*entity.Secret, error) <span class="cov8" title="1">{
+        s := &amp;entity.Secret{
+                ID:        0,
+                UserId:    userId,
+                UpdatedAt: time.Now().UnixNano(),
+                IsDeleted: false,
+                Data:      data,
+        }
+        row := r.dp.Db.QueryRowContext(ctx, r.dp.PrefixQuery(`
+        INSERT INTO $prefix$secret(user_id, updated_at, data) VALUES (@id, @updatedAt, @data) RETURNING id 
+    `), pgx.NamedArgs{
+                "id":        s.UserId,
+                "updatedAt": s.UpdatedAt,
+                "data":      s.Data,
+        })
+        if err := row.Scan(&amp;s.ID); err != nil </span><span class="cov8" title="1">{
+                return nil, fmt.Errorf("error creating secret: %w", err)
+        }</span>
+        <span class="cov8" title="1">return s, nil</span>
+}
+
+func (r *SecretDBRepository) Update(ctx context.Context, id int64, data []byte, oldUpdatedAt int64) (*entity.Secret, error) <span class="cov8" title="1">{
+        tx, err := r.dp.Db.BeginTx(ctx, nil)
+        defer tx.Rollback()
+
+        row := r.dp.Db.QueryRowContext(ctx, r.dp.PrefixQuery(`
+        SELECT s.id, s.user_id, s.updated_at, s.is_deleted, s.data FROM $prefix$secret s WHERE s.id = @id FOR UPDATE
+    `), pgx.NamedArgs{"id": id})
+        s, err := r.scanSecret(row)
+        if err != nil </span><span class="cov8" title="1">{
+                return nil, fmt.Errorf("error fetching secret: %w", err)
+        }</span>
+        <span class="cov8" title="1">if s.UpdatedAt != oldUpdatedAt </span><span class="cov8" title="1">{
+                return nil, repository.ErrSecretTimeNotMatch
+        }</span>
+
+        <span class="cov8" title="1">s.UpdatedAt = time.Now().UnixNano()
+        s.Data = data
+
+        _, err = r.dp.Db.ExecContext(ctx, r.dp.PrefixQuery(`
+        UPDATE $prefix$secret SET updated_at = @updatedAt, DATA = @data WHERE id = @id
+    `), pgx.NamedArgs{
+                "id":        s.ID,
+                "updatedAt": s.UpdatedAt,
+                "data":      s.Data,
+        })
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov8" title="1">err = tx.Commit()
+        if err != nil </span><span class="cov0" title="0">{
+                s = nil
+        }</span>
+
+        <span class="cov8" title="1">return s, err</span>
+}
+func (r *SecretDBRepository) Delete(ctx context.Context, id int64, oldUpdatedAt int64) error <span class="cov8" title="1">{
+        tx, err := r.dp.Db.BeginTx(ctx, nil)
+        defer tx.Rollback()
+
+        row := r.dp.Db.QueryRowContext(ctx, r.dp.PrefixQuery(`
+        SELECT s.id, s.user_id, s.updated_at, s.is_deleted, s.data FROM $prefix$secret s WHERE s.id = @id FOR UPDATE
+    `), pgx.NamedArgs{"id": id})
+        s, err := r.scanSecret(row)
+        if err != nil </span><span class="cov8" title="1">{
+                return fmt.Errorf("error fetching secret: %w", err)
+        }</span>
+        <span class="cov8" title="1">if s.UpdatedAt != oldUpdatedAt </span><span class="cov8" title="1">{
+                return repository.ErrSecretTimeNotMatch
+        }</span>
+
+        <span class="cov8" title="1">s.UpdatedAt = time.Now().UnixNano()
+        s.IsDeleted = true
+
+        _, err = r.dp.Db.ExecContext(ctx, r.dp.PrefixQuery(`
+        UPDATE $prefix$secret SET updated_at = @updatedAt, DATA = @data, is_deleted = true WHERE id = @id
+    `), pgx.NamedArgs{
+                "id":        s.ID,
+                "updatedAt": s.UpdatedAt,
+                "data":      s.Data,
+        })
+        if err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+
+        <span class="cov8" title="1">return tx.Commit()</span>
+}
+
+func (r *SecretDBRepository) scanSecret(row pgx.Row) (*entity.Secret, error) <span class="cov8" title="1">{
+        var s entity.Secret
+        if err := row.Scan(&amp;s.ID, &amp;s.UserId, &amp;s.UpdatedAt, &amp;s.IsDeleted, &amp;s.Data); err != nil </span><span class="cov8" title="1">{
+                return nil, err
+        }</span>
+        <span class="cov8" title="1">return &amp;s, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file6" style="display: none">// Package dbrepository - DB repository, secrets file
+package dbrepository
+
+import (
+        "context"
+        "github.com/fasdalf/train-go-gophkeeper/internal/server/model/entity"
+        "github.com/fasdalf/train-go-gophkeeper/internal/server/model/repository"
+)
+
+var typeCheckSecretMockRepository repository.SecretRepository = &amp;SecretMockRepository{}
+
+type SecretMockRepository struct {
+        Secret  *entity.Secret
+        Secrets []*entity.Secret
+        Error   error
+}
+
+func (r *SecretMockRepository) FindById(ctx context.Context, Id int64) (*entity.Secret, error) <span class="cov8" title="1">{
+        return r.Secret, r.Error
 }</span>
-func (r *SecretDBRepository) Create(UserId uint64, Data []byte) (*entity.Secret, error) <span class="cov0" title="0">{
-        return nil, nil
+func (r *SecretMockRepository) FindAfter(ctx context.Context, UserId int64, UpdatedAt int64) ([]*entity.Secret, error) <span class="cov8" title="1">{
+        return r.Secrets, r.Error
 }</span>
-func (r *SecretDBRepository) Update(Id uint64, Data []byte, OldUpdatedAt uint64) (*entity.Secret, error) <span class="cov0" title="0">{
-        return nil, nil
+func (r *SecretMockRepository) Create(ctx context.Context, UserId int64, Data []byte) (*entity.Secret, error) <span class="cov8" title="1">{
+        return r.Secret, r.Error
 }</span>
-func (r *SecretDBRepository) Delete(Id uint64, OldUpdatedAt uint64) (*entity.Secret, error) <span class="cov0" title="0">{
-        return nil, nil
+func (r *SecretMockRepository) Update(ctx context.Context, Id int64, Data []byte, OldUpdatedAt int64) (*entity.Secret, error) <span class="cov8" title="1">{
+        return r.Secret, r.Error
+}</span>
+func (r *SecretMockRepository) Delete(ctx context.Context, Id int64, OldUpdatedAt int64) error <span class="cov8" title="1">{
+        return r.Error
 }</span>
 </pre>
 		
-		<pre class="file" id="file6" style="display: none">// Package dbrepository - DB repository, users file
+		<pre class="file" id="file7" style="display: none">// Package dbrepository - DB repository, users file
 package dbrepository
 
 import (
@@ -317,12 +467,14 @@ import (
         "database/sql"
         "errors"
         "fmt"
-        dbstorage "github.com/fasdalf/train-go-gophkeeper/internal/server/db/storage"
-        "github.com/fasdalf/train-go-gophkeeper/internal/server/model/entity"
-        "github.com/fasdalf/train-go-gophkeeper/internal/server/model/repository"
+
         "github.com/jackc/pgerrcode"
         "github.com/jackc/pgx/v5"
         "github.com/jackc/pgx/v5/pgconn"
+
+        dbstorage "github.com/fasdalf/train-go-gophkeeper/internal/server/db/storage"
+        "github.com/fasdalf/train-go-gophkeeper/internal/server/model/entity"
+        "github.com/fasdalf/train-go-gophkeeper/internal/server/model/repository"
 )
 
 // typeCheckUserDBRepository ensures that UserDBRepository implements the UserRepository interface.
@@ -340,7 +492,7 @@ func NewUserDBRepository(dp *dbstorage.DBProxy) *UserDBRepository <span class="c
 }</span>
 
 // FindById retrieves a user by their id.
-func (r *UserDBRepository) FindById(ctx context.Context, id uint64) (*entity.User, error) <span class="cov8" title="1">{
+func (r *UserDBRepository) FindById(ctx context.Context, id int64) (*entity.User, error) <span class="cov8" title="1">{
         var user entity.User
         row := r.dp.Db.QueryRowContext(ctx, r.dp.PrefixQuery(`
         SELECT u.id, u.login, u.pass_hash FROM $prefix$user u
@@ -398,7 +550,7 @@ func (r *UserDBRepository) Create(ctx context.Context, login, passHash string) (
 }
 </pre>
 		
-		<pre class="file" id="file7" style="display: none">// Package dbrepository - DB repository, users file
+		<pre class="file" id="file8" style="display: none">// Package dbrepository - DB repository, users file
 package dbrepository
 
 import (
@@ -416,7 +568,7 @@ type UserMockRepository struct {
 }
 
 // FindById retrieves a user by their id.
-func (r *UserMockRepository) FindById(ctx context.Context, id uint64) (*entity.User, error) <span class="cov8" title="1">{
+func (r *UserMockRepository) FindById(ctx context.Context, id int64) (*entity.User, error) <span class="cov8" title="1">{
         return r.User, r.Error
 }</span>
 
@@ -431,7 +583,7 @@ func (r *UserMockRepository) Create(ctx context.Context, login, passHash string)
 }</span>
 </pre>
 		
-		<pre class="file" id="file8" style="display: none">// Package dbstorage - DB storage
+		<pre class="file" id="file9" style="display: none">// Package dbstorage - DB storage
 package dbstorage
 
 import (
@@ -502,7 +654,7 @@ func (s *DBProxy) runMigrations(ctx context.Context, migrations []string) error 
 }
 </pre>
 		
-		<pre class="file" id="file9" style="display: none">// Package dbstorage - DB storage
+		<pre class="file" id="file10" style="display: none">// Package dbstorage - DB storage
 package dbstorage
 
 import (
@@ -561,7 +713,59 @@ func (s *DBProxy) PrefixQuery(query string) string <span class="cov8" title="1">
 }</span>
 </pre>
 		
-		<pre class="file" id="file10" style="display: none">package controller
+		<pre class="file" id="file11" style="display: none">package controller
+
+import (
+        "context"
+        "log/slog"
+        "time"
+
+        "google.golang.org/grpc/codes"
+        "google.golang.org/grpc/status"
+
+        pb "github.com/fasdalf/train-go-gophkeeper/internal/common/proto/gophkeeperserver"
+        "github.com/fasdalf/train-go-gophkeeper/internal/server/grpc/contextkeys"
+)
+
+func (s *GophKeeperServer) ListSecrets(ctx context.Context, r *pb.ListSecretsRequest) (*pb.ListSecretsResponse, error) <span class="cov0" title="0">{
+        userID := ctx.Value(contextkeys.UserIDKey).(int64)
+        if userID == 0 </span><span class="cov0" title="0">{
+                slog.Error("user is not loaded")
+                gErr := status.Errorf(codes.Internal, "user is not loaded")
+                return nil, gErr
+        }</span>
+        <span class="cov0" title="0">syncTs := time.Now().UnixNano()
+        fromTs := int64(0)
+        if r != nil </span><span class="cov0" title="0">{
+                fromTs = r.FromTs
+        }</span>
+
+        <span class="cov0" title="0">secrets, err := s.secretRepo.FindAfter(ctx, userID, fromTs)
+        if err != nil </span><span class="cov0" title="0">{
+                slog.Error("failed to fetch secrets", "err", err)
+                gErr := status.Errorf(codes.Internal, "failed to fetch secrets")
+
+                return nil, gErr
+        }</span>
+
+        <span class="cov0" title="0">resp := &amp;pb.ListSecretsResponse{Secrets: make([]*pb.ListSecretsResponseSecret, len(secrets)), SyncTs: syncTs}
+        for i, secret := range secrets </span><span class="cov0" title="0">{
+                rs := pb.ListSecretsResponseSecret{
+                        Id:        secret.ID,
+                        Ts:        secret.UpdatedAt,
+                        IsDeleted: secret.IsDeleted,
+                }
+                if !secret.IsDeleted </span><span class="cov0" title="0">{
+                        rs.Data = secret.Data
+                }</span>
+                <span class="cov0" title="0">resp.Secrets[i] = &amp;rs</span>
+        }
+
+        <span class="cov0" title="0">return resp, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file12" style="display: none">package controller
 
 import (
         pb "github.com/fasdalf/train-go-gophkeeper/internal/common/proto/gophkeeperserver"
@@ -596,7 +800,7 @@ func NewGophKeeperServer(
 }</span>
 </pre>
 		
-		<pre class="file" id="file11" style="display: none">package controller
+		<pre class="file" id="file13" style="display: none">package controller
 
 import (
         "context"
@@ -636,7 +840,7 @@ func (s *GophKeeperServer) UserSignIn(ctx context.Context, r *pb.UserSignInReque
 }
 </pre>
 		
-		<pre class="file" id="file12" style="display: none">package controller
+		<pre class="file" id="file14" style="display: none">package controller
 
 import (
         "context"
@@ -676,7 +880,7 @@ func (s *GophKeeperServer) UserSignUp(ctx context.Context, r *pb.UserSignUpReque
 }
 </pre>
 		
-		<pre class="file" id="file13" style="display: none">package interceptors
+		<pre class="file" id="file15" style="display: none">package interceptors
 
 import (
         "context"
@@ -699,7 +903,7 @@ func NewSlogInterceptor() grpc.UnaryServerInterceptor <span class="cov8" title="
 }
 </pre>
 		
-		<pre class="file" id="file14" style="display: none">package interceptors
+		<pre class="file" id="file16" style="display: none">package interceptors
 
 import (
         "context"
@@ -712,15 +916,12 @@ import (
         "google.golang.org/grpc/metadata"
         "google.golang.org/grpc/status"
 
+        "github.com/fasdalf/train-go-gophkeeper/internal/server/grpc/contextkeys"
         "github.com/fasdalf/train-go-gophkeeper/internal/server/jwt"
 )
 
 const (
         methodPrefix = "/gophkeeperserver.GophKeeper/User"
-)
-
-var (
-        userIdKey = struct{}{}
 )
 
 func NewValidateTokenInterceptor(key *string) grpc.UnaryServerInterceptor <span class="cov8" title="1">{
@@ -733,7 +934,7 @@ func NewValidateTokenInterceptor(key *string) grpc.UnaryServerInterceptor <span 
                                 msg := fmt.Sprintf("%s token is empty or invalid: %s", jwt.AuthHeader, token)
                                 return nil, status.Error(codes.Unauthenticated, msg)
                         }</span>
-                        <span class="cov8" title="1">ctx = context.WithValue(ctx, userIdKey, userID)</span>
+                        <span class="cov8" title="1">ctx = context.WithValue(ctx, contextkeys.UserIDKey, userID)</span>
                 }
                 <span class="cov8" title="1">return handler(ctx, req)</span>
         }
@@ -749,7 +950,7 @@ func getFirstMd(ctx context.Context, key string) (s string) <span class="cov8" t
 }
 </pre>
 		
-		<pre class="file" id="file15" style="display: none">package grpcserver
+		<pre class="file" id="file17" style="display: none">package grpcserver
 
 import (
         "github.com/fasdalf/train-go-gophkeeper/internal/server/model/repository"
@@ -797,7 +998,7 @@ func ListenAndServe(server *grpc.Server, addr string) error <span class="cov8" t
 }
 </pre>
 		
-		<pre class="file" id="file16" style="display: none">package jwt
+		<pre class="file" id="file18" style="display: none">package jwt
 
 import (
         "fmt"
@@ -807,7 +1008,7 @@ import (
 
 type Claims struct {
         jwt.RegisteredClaims
-        UserID uint64
+        UserID int64
 }
 
 const (
@@ -816,7 +1017,7 @@ const (
 )
 
 // BuildJWTString создаёт токен и возвращает его в виде строки
-func BuildJWTString(id uint64, key *string, exp time.Duration) string <span class="cov8" title="1">{
+func BuildJWTString(id int64, key *string, exp time.Duration) string <span class="cov8" title="1">{
         token := jwt.NewWithClaims(jwt.SigningMethodHS256, Claims{
                 RegisteredClaims: jwt.RegisteredClaims{
                         // когда истекает токен
@@ -832,7 +1033,7 @@ func BuildJWTString(id uint64, key *string, exp time.Duration) string <span clas
 }</span>
 
 // GetUserID валидирует токен и возвращает ID пользователя
-func GetUserID(tokenString, key *string) (uint64, error) <span class="cov8" title="1">{
+func GetUserID(tokenString, key *string) (int64, error) <span class="cov8" title="1">{
         claims := &amp;Claims{}
         _, err := jwt.ParseWithClaims(*tokenString, claims, func(t *jwt.Token) (interface{}, error) </span><span class="cov8" title="1">{
                 if t.Method != jwt.SigningMethodHS256 </span><span class="cov0" title="0">{

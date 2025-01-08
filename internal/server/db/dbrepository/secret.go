@@ -62,11 +62,9 @@ func (r *SecretDBRepository) FindAfter(ctx context.Context, userId int64, update
 		}
 		results = append(results, s)
 	}
-	if err = rows.Err(); err != nil {
-		return nil, err
-	}
+	err = rows.Err()
 
-	return results, nil
+	return results, err
 }
 
 func (r *SecretDBRepository) Create(ctx context.Context, userId int64, data []byte) (*entity.Secret, error) {
