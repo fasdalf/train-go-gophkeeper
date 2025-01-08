@@ -62,7 +62,7 @@ func TestUserDBRepository_Create_AllCases(t *testing.T) {
 
 func TestUserDBRepository_FindById(t *testing.T) {
 	type args struct {
-		id uint64
+		id int64
 	}
 	tests := []struct {
 		name    string

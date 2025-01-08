@@ -6,12 +6,14 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	dbstorage "github.com/fasdalf/train-go-gophkeeper/internal/server/db/storage"
-	"github.com/fasdalf/train-go-gophkeeper/internal/server/model/entity"
-	"github.com/fasdalf/train-go-gophkeeper/internal/server/model/repository"
+
 	"github.com/jackc/pgerrcode"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
+
+	dbstorage "github.com/fasdalf/train-go-gophkeeper/internal/server/db/storage"
+	"github.com/fasdalf/train-go-gophkeeper/internal/server/model/entity"
+	"github.com/fasdalf/train-go-gophkeeper/internal/server/model/repository"
 )
 
 // typeCheckUserDBRepository ensures that UserDBRepository implements the UserRepository interface.
@@ -29,7 +31,7 @@ func NewUserDBRepository(dp *dbstorage.DBProxy) *UserDBRepository {
 }
 
 // FindById retrieves a user by their id.
-func (r *UserDBRepository) FindById(ctx context.Context, id uint64) (*entity.User, error) {
+func (r *UserDBRepository) FindById(ctx context.Context, id int64) (*entity.User, error) {
 	var user entity.User
 	row := r.dp.Db.QueryRowContext(ctx, r.dp.PrefixQuery(`
         SELECT u.id, u.login, u.pass_hash FROM $prefix$user u

@@ -6,7 +6,7 @@ import (
 )
 
 func Example() {
-	startID := uint64(100)
+	startID := int64(100)
 	key := "mock key"
 	exp := 3 * time.Hour
 

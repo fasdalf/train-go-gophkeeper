@@ -16,7 +16,7 @@ type UserMockRepository struct {
 }
 
 // FindById retrieves a user by their id.
-func (r *UserMockRepository) FindById(ctx context.Context, id uint64) (*entity.User, error) {
+func (r *UserMockRepository) FindById(ctx context.Context, id int64) (*entity.User, error) {
 	return r.User, r.Error
 }
 

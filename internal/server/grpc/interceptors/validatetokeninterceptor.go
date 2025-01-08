@@ -11,15 +11,12 @@ import (
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 
+	"github.com/fasdalf/train-go-gophkeeper/internal/server/grpc/contextkeys"
 	"github.com/fasdalf/train-go-gophkeeper/internal/server/jwt"
 )
 
 const (
 	methodPrefix = "/gophkeeperserver.GophKeeper/User"
-)
-
-var (
-	userIdKey = struct{}{}
 )
 
 func NewValidateTokenInterceptor(key *string) grpc.UnaryServerInterceptor {
@@ -32,7 +29,7 @@ func NewValidateTokenInterceptor(key *string) grpc.UnaryServerInterceptor {
 				msg := fmt.Sprintf("%s token is empty or invalid: %s", jwt.AuthHeader, token)
 				return nil, status.Error(codes.Unauthenticated, msg)
 			}
-			ctx = context.WithValue(ctx, userIdKey, userID)
+			ctx = context.WithValue(ctx, contextkeys.UserIDKey, userID)
 		}
 		return handler(ctx, req)
 	}

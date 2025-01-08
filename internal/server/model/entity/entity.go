@@ -2,14 +2,15 @@
 package entity
 
 type User struct {
-	ID       uint64
+	ID       int64
 	Login    string
 	PassHash string
 }
 
 type Secret struct {
-	ID        uint64
-	UserId    uint64
-	UpdatedAt uint64
+	ID        int64
+	UserId    int64
+	UpdatedAt int64
+	IsDeleted bool
 	Data      []byte
 }

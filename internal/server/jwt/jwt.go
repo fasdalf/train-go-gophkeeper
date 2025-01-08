@@ -8,7 +8,7 @@ import (
 
 type Claims struct {
 	jwt.RegisteredClaims
-	UserID uint64
+	UserID int64
 }
 
 const (
@@ -17,7 +17,7 @@ const (
 )
 
 // BuildJWTString создаёт токен и возвращает его в виде строки
-func BuildJWTString(id uint64, key *string, exp time.Duration) string {
+func BuildJWTString(id int64, key *string, exp time.Duration) string {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, Claims{
 		RegisteredClaims: jwt.RegisteredClaims{
 			// когда истекает токен
@@ -33,7 +33,7 @@ func BuildJWTString(id uint64, key *string, exp time.Duration) string {
 }
 
 // GetUserID валидирует токен и возвращает ID пользователя
-func GetUserID(tokenString, key *string) (uint64, error) {
+func GetUserID(tokenString, key *string) (int64, error) {
 	claims := &Claims{}
 	_, err := jwt.ParseWithClaims(*tokenString, claims, func(t *jwt.Token) (interface{}, error) {
 		if t.Method != jwt.SigningMethodHS256 {

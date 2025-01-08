@@ -7,17 +7,17 @@ import (
 )
 
 type UserRepository interface {
-	FindById(ctx context.Context, Id uint64) (*entity.User, error)
+	FindById(ctx context.Context, Id int64) (*entity.User, error)
 	FindByLogin(ctx context.Context, login string) (*entity.User, error)
 	Create(ctx context.Context, login, passHash string) (*entity.User, error)
 }
 
 type SecretRepository interface {
-	FindById(Id uint64) (*entity.Secret, error)
-	FindAfter(UserId uint64, UpdatedAt uint64) ([]*entity.Secret, error)
-	Create(UserId uint64, Data []byte) (*entity.Secret, error)
-	Update(Id uint64, Data []byte, OldUpdatedAt uint64) (*entity.Secret, error)
-	Delete(Id uint64, OldUpdatedAt uint64) (*entity.Secret, error)
+	FindById(ctx context.Context, id int64) (*entity.Secret, error)
+	FindAfter(ctx context.Context, userId int64, updatedAt int64) ([]*entity.Secret, error)
+	Create(ctx context.Context, userId int64, data []byte) (*entity.Secret, error)
+	Update(ctx context.Context, id int64, data []byte, oldUpdatedAt int64) (*entity.Secret, error)
+	Delete(ctx context.Context, id int64, oldUpdatedAt int64) error
 }
 
 var (
