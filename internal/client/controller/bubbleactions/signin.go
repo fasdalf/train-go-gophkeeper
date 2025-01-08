@@ -36,7 +36,6 @@ func (s *SignInController) Handle(m tea.Model) tea.Model {
 	}
 	login := form.Fields[0].Value
 	pass := form.Fields[1].Value
-	slog.Info("##@@ signup", "login", login, "pass", pass)
 	token, err := s.getToken(login, pass)
 	if err != nil {
 		slog.Error("could not sign in user", "err", err)

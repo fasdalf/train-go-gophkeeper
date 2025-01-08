@@ -24,13 +24,11 @@ func forceWindowSize() tea.Msg {
 }
 
 func (m *MessageModel) Init() tea.Cmd {
-	// TODO: ##@@ #cleanup
-	//m.Width, m.Height, _ = term.GetSize(os.Stdout.Fd())
 	return forceWindowSize
 }
 
 func (m *MessageModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	slog.Info("##@@ update called", "msg", msg, "m", m, "type", reflect.TypeOf(m), "type", reflect.TypeOf(msg))
+	slog.Info("MessageModel update called", "msg", msg, "m", m, "type", reflect.TypeOf(m), "type", reflect.TypeOf(msg))
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
 		m.Width = msg.Width
@@ -39,7 +37,7 @@ func (m *MessageModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "ctrl+c":
-			slog.Info("##@@ got ctrl+c")
+			slog.Info("MessageModel got ctrl+c")
 			return m, tea.Quit
 		default:
 			if m.Next != nil {

@@ -45,7 +45,6 @@ func (s *FillListFormService) Fill(form *bubbleforms.InputsModel) tea.Model {
 
 	items := []list.Item{}
 	for i, name := range s.repository.ListSecrets() {
-		slog.Info("##@@ fill append", "name", name)
 		items = append(items, bubbleforms.ListItem{
 			Name: name,
 			Desc: "",
@@ -53,8 +52,6 @@ func (s *FillListFormService) Fill(form *bubbleforms.InputsModel) tea.Model {
 		})
 	}
 	listModel.List.SetItems(items)
-	//slog.Info("##@@ list form signin", "items", items, "listModel", listModel)
-	slog.Info("##@@ fill listModel.List.SetItems", "items", items, "LI", listModel.List.Items())
 
 	return listModel
 }

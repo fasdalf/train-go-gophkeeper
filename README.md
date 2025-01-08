@@ -1,6 +1,11 @@
 # train-go-gophkeeper
 diploma 2
 
+#### running
+docker-compose up -d
+???
+profit
+
 #### Future roadmap
 
 How to secure gRPC connection with SSL/TLS in Go

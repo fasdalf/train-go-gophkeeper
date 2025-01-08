@@ -43,7 +43,7 @@ message ListSecretsResponse {
     int64 id = 1;
     bytes data = 2; // not set with is_deleted=true
     int64 ts = 3; // Server's save unixtime in nanoseconds
-    bool is_deleted = 4; // not set with non empty data TODO: maybe later
+    bool is_deleted = 4; // not set with non empty data
   }
   repeated secret secrets = 1; // All new and updated secrets
   int64 sync_ts = 2; // All values are saved until this unixtime in nanoseconds

@@ -3,7 +3,6 @@ package syncroniser
 import (
 	ifcs "github.com/fasdalf/train-go-gophkeeper/internal/client/interfaces"
 	"github.com/fasdalf/train-go-gophkeeper/internal/client/model/entity"
-	"log/slog"
 )
 
 var typeCheckSyncroniser ifcs.Syncroniser = &Syncroniser{}
@@ -15,15 +14,11 @@ type Syncroniser struct {
 }
 
 func (s *Syncroniser) Sync() error {
-	slog.Info("##@@ Sync s.Remote.ListSecrets ##@@")
 	remoteSecrets, err := s.Remote.ListSecrets(s.SyncedUpTo)
 	if err != nil {
-		slog.Info("##@@ s.Remote.ListSecrets ##@@")
 		return err
 	}
 	for _, rs := range remoteSecrets.GetSecrets() {
-		slog.Info("##@@ list form signin", "rs", *rs)
-		slog.Info("##@@ (s *Syncroniser) Sync()", "rs-data", rs.Data)
 		lid, err := s.Local.GetSecretIdByServerId(rs.Id)
 		if err != nil {
 			// it's new, add

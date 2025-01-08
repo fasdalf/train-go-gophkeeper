@@ -1,5 +1,4 @@
 // Package interfaces - break circle dependencies.
-// TODO: ##@@ extract to using packages
 package interfaces
 
 import (

@@ -5,7 +5,6 @@ import (
 	"errors"
 	ifcs "github.com/fasdalf/train-go-gophkeeper/internal/client/interfaces"
 	"github.com/fasdalf/train-go-gophkeeper/internal/client/model/entity"
-	"log/slog"
 )
 
 var typeCheckLocalRepository ifcs.LocalRepository = &LocalRepository{}
@@ -41,17 +40,15 @@ func (r *LocalRepository) ClearSecrets() {
 }
 
 func (r *LocalRepository) AddSecret(secret entity.Secret) (int, error) {
-	slog.Info("##@@ AddSecret list form signin", "secret", secret)
 	i := len(r.items)
 	data, _ := secret.GetData()
-	slog.Info("##@@ AddSecret list form signin", "secret", secret.Data, "data", data)
 	li := localItem{
 		name:   data.Name,
 		secret: secret,
 	}
 	r.items = append(r.items, li)
 	r.byServerId[secret.ServerID] = i
-	slog.Info("##@@ AddSecret list form signin", "items", r.items, "byServerId", r.byServerId)
+
 	return i, nil
 }
 

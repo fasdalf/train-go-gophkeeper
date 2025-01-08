@@ -34,12 +34,12 @@ func (m *ListModel) Init() tea.Cmd {
 }
 
 func (m *ListModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	slog.Info("##@@ update called", "msg", msg)
+	slog.Info("ListModel update called", "msg", msg)
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "ctrl+c":
-			slog.Info("##@@ got ctrl+c")
+			slog.Info("ListModel got ctrl+c")
 			return m, tea.Quit
 		case "insert":
 			m2 := m.AddHandler.Handle(m)
@@ -71,39 +71,12 @@ func (m *ListModel) View() string {
 }
 
 func NewListModel(addHandler ifcs.ButtonHandler, editHandler ifcs.ButtonHandler) *ListModel {
-	// TODO: ##@@ cleanup
-	//items := []list.Item{
-	//	//ListItem{Name: "Raspberry Pi’s", Desc: "I have ’em all over my house"},
-	//	//ListItem{Name: "Nutella", Desc: "It's good on toast"},
-	//	//ListItem{Name: "Bitter melon", Desc: "It cools you down"},
-	//	//ListItem{Name: "Nice socks", Desc: "And by that I mean socks without holes"},
-	//	//ListItem{Name: "Eight hours of sleep", Desc: "I had this once"},
-	//	//ListItem{Name: "Cats", Desc: "Usually"},
-	//	//ListItem{Name: "Plantasia, the album", Desc: "My plants love it too"},
-	//	//ListItem{Name: "Pour over coffee", Desc: "It takes forever to make though"},
-	//	//ListItem{Name: "VR", Desc: "Virtual reality...what is there to say?"},
-	//	//ListItem{Name: "Noguchi Lamps", Desc: "Such pleasing organic forms"},
-	//	//ListItem{Name: "Linux", Desc: "Pretty much the best OS"},
-	//	//ListItem{Name: "Business school", Desc: "Just kidding"},
-	//	//ListItem{Name: "Pottery", Desc: "Wet clay is a great feeling"},
-	//	//ListItem{Name: "Shampoo", Desc: "Nothing like clean hair"},
-	//	//ListItem{Name: "Table tennis", Desc: "It’s surprisingly exhausting"},
-	//	//ListItem{Name: "Milk crates", Desc: "Great for packing in your extra stuff"},
-	//	//ListItem{Name: "Afternoon tea", Desc: "Especially the tea sandwich part"},
-	//	//ListItem{Name: "Stickers", Desc: "The thicker the vinyl the better"},
-	//	//ListItem{Name: "20° Weather", Desc: "Celsius, not Fahrenheit"},
-	//	//ListItem{Name: "Warm light", Desc: "Like around 2700 Kelvin"},
-	//	//ListItem{Name: "The vernal equinox", Desc: "The autumnal equinox is pretty good too"},
-	//	//ListItem{Name: "Gaffer’s tape", Desc: "Basically sticky fabric"},
-	//	//ListItem{Name: "Terrycloth", Desc: "In other words, towel fabric"},
-	//}
-
 	lid := list.NewDefaultDelegate()
 	lid.ShowDescription = false
 	l := list.New([]list.Item{}, lid, 0, 0)
 	l.Title = listTitle
 	l.SetShowTitle(true)
-	// TODO: implement AdditionalShortHelpKeys + AdditionalFullHelpKeys
+	// TODO: ##@@ implement AdditionalShortHelpKeys + AdditionalFullHelpKeys
 	l.SetShowHelp(false)
 	l.DisableQuitKeybindings()
 	m := ListModel{

@@ -25,6 +25,14 @@ func main() {
 		BuildDate:    buildDate,
 		BuildCommit:  buildCommit,
 	}).Print()
+	// TODO: ##@@ improve N
+	// * Make printbuild work with --version arg only
+	// * quit after output
+	// * move to printbuild package
+	// * Write script to fill them on build.
+
+	// TODO: ##@@ improve N+1
+	// * Write cross-platform build script for client and server.
 
 	ctx := context.Background()
 	cfg := config.GetConfig()
@@ -48,25 +56,4 @@ func main() {
 	slog.Info("interrupt signal received")
 	signal.Stop(quit)
 	gs.GracefulStop()
-
-	// TODO: ##@@ plan
-	// users repo
-	// grpc service
-	// client forms
-	// grpc client
-
-	// TODO: ##@@ improve 1
-	// secrets repo
-	// auth interceptor
-	// more client forms
-	// auth in grpc client
-
-	// TODO: ##@@ improve N
-	// * Make it work with --version arg only
-	// * quit after output
-	// * move to printbuild package
-	// * Write script to fill them on build.
-
-	// TODO: ##@@ improve N+1
-	// * Write cross-platform build script for client and server.
 }

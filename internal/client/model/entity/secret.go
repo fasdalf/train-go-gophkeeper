@@ -14,11 +14,7 @@ type Secret struct {
 	ServerID        int64
 	ServerUpdatedAt int64
 	Data            *[]byte
-	// TODO: ##@@ not used?
-	//IsDirty         bool
 }
-
-// TODO: ##@@ move elsewhere to make cryptography single dependency
 
 func (s *Secret) GetData() (SecretData, error) {
 	var sd SecretData

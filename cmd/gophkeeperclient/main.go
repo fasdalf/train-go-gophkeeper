@@ -11,9 +11,30 @@ import (
 	"github.com/fasdalf/train-go-gophkeeper/internal/client/services/localrepository"
 	"github.com/fasdalf/train-go-gophkeeper/internal/client/services/syncroniser"
 	"github.com/fasdalf/train-go-gophkeeper/internal/client/view/bubbleforms"
+	"github.com/fasdalf/train-go-gophkeeper/internal/common/printbuild"
+)
+
+var (
+	buildVersion string
+	buildDate    string
+	buildCommit  string
 )
 
 func main() {
+	(&printbuild.Data{
+		BuildVersion: buildVersion,
+		BuildDate:    buildDate,
+		BuildCommit:  buildCommit,
+	}).Print()
+	// TODO: ##@@ improve N
+	// * Make printbuild work with --version arg only
+	// * quit after output
+	// * move to printbuild package
+	// * Write script to fill them on build.
+
+	// TODO: ##@@ improve N+1
+	// * Write cross-platform build script for client and server.
+
 	f, err := tea.LogToFile("debug.log", "[debug gophkeeper client]")
 	if err != nil {
 		fmt.Println("fatal:", err)

@@ -7,7 +7,6 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	ifcs "github.com/fasdalf/train-go-gophkeeper/internal/client/interfaces"
 	"log/slog"
-	"strconv"
 	"strings"
 )
 
@@ -84,46 +83,32 @@ func (m *InputsModel) Init() tea.Cmd {
 }
 
 func (m *InputsModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	slog.Info("##@@ update called", "msg", msg, "m", m)
+	slog.Info("InputsModel update called", "msg", msg, "m", m)
 
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
-		// todo: ##@@ cleanup
-		//case "ctrl+c", "esc":
 		case "ctrl+c":
+			slog.Info("InputsModel got ctrl+c")
 			return m, tea.Quit
-
 		// Set focus to next input
 		case "tab", "shift+tab", "enter", "up", "down":
 			s := msg.String()
 
 			// Did the user press enter while the button was focused?
 			if s == "enter" && m.focusIndex >= len(m.Fields) {
-				slog.Info("##@@ focus index is out of range", "m.focusIndex", m.focusIndex, "len(m.Fields)", len(m.Fields))
 				buttonHandler := m.buttons[m.focusIndex-len(m.Fields)].Handler
-				slog.Info("##@@ focus index is out of range", "buttonHandler", buttonHandler)
 				newModel := m.callHandler(buttonHandler)
-				//m.parentItem.Name = m.inputs[0].Value()
-				//m.parentItem.Desc = m.inputs[1].Value()
-				//m.parentModel.List.SetItem(m.parentIndex, m.parentItem)
-				//// in case of adding
-				//m.parentModel.List.Select(m.parentIndex)
-
-				// TODO: investigate use of init() for this case
 				return newModel, newModel.Init()
 			}
 
 			// Cycle indexes
 			if s == "up" || s == "shift+tab" {
-				slog.Info("##@@ m.focusIndex--")
 				m.focusIndex--
 			} else {
-				slog.Info("##@@ m.focusIndex--")
 				m.focusIndex++
 			}
 
-			slog.Info("##@@ m.focusIndex", "focusIndex", m.focusIndex, "len(m.Fields)", len(m.Fields))
 			lenAll := len(m.Fields) + len(m.buttons)
 			if m.focusIndex >= lenAll {
 				m.focusIndex = 0
@@ -167,7 +152,6 @@ func (m *InputsModel) updateInputs(msg tea.Msg) tea.Cmd {
 		if m.textinputs[i] == nil {
 			continue
 		}
-		slog.Info("##@@ input value", strconv.Itoa(i), m.textinputs[i].Value())
 		ti, cmd := m.textinputs[i].Update(msg)
 		m.textinputs[i], cmds[i] = &ti, cmd
 	}
@@ -206,17 +190,6 @@ func (m *InputsModel) View() string {
 			b.WriteRune('\n')
 		}
 	}
-
-	// ##@@ cleanup
-	//button := &blurredButton
-	//if m.focusIndex == len(m.inputs) {
-	//	button = &focusedButton
-	//}
-	//fmt.Fprintf(&b, "\n\n%s\n\n", *button)
-	//
-	//b.WriteString(helpStyle.Render("cursor mode is "))
-	//b.WriteString(cursorModeHelpStyle.Render(m.cursorMode.String()))
-	//b.WriteString(helpStyle.Render(" (ctrl+r to change style)"))
 
 	return b.String()
 }

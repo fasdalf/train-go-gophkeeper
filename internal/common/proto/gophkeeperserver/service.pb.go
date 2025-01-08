@@ -685,7 +685,7 @@ type ListSecretsResponseSecret struct {
 	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
 	Data          []byte                 `protobuf:"bytes,2,opt,name=data,proto3" json:"data,omitempty"`                             // not set with is_deleted=true
 	Ts            int64                  `protobuf:"varint,3,opt,name=ts,proto3" json:"ts,omitempty"`                                // Server's save unixtime in nanoseconds
-	IsDeleted     bool                   `protobuf:"varint,4,opt,name=is_deleted,json=isDeleted,proto3" json:"is_deleted,omitempty"` // not set with non empty data TODO: maybe later
+	IsDeleted     bool                   `protobuf:"varint,4,opt,name=is_deleted,json=isDeleted,proto3" json:"is_deleted,omitempty"` // not set with non empty data
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
