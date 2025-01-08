@@ -2,23 +2,69 @@ package main
 
 import (
 	"fmt"
-	"time"
+	"os"
+
+	tea "github.com/charmbracelet/bubbletea"
+
+	"github.com/fasdalf/train-go-gophkeeper/internal/client/controller/bubbleactions"
+	"github.com/fasdalf/train-go-gophkeeper/internal/client/services/grpcclient"
+	"github.com/fasdalf/train-go-gophkeeper/internal/client/services/localrepository"
+	"github.com/fasdalf/train-go-gophkeeper/internal/client/services/syncroniser"
+	"github.com/fasdalf/train-go-gophkeeper/internal/client/view/bubbleforms"
 )
 
-//TIP <p>To run your code, right-click the code and select <b>Run</b>.</p> <p>Alternatively, click
-// the <icon src="AllIcons.Actions.Execute"/> icon in the gutter and select the <b>Run</b> menu item from here.</p>
-
 func main() {
-	//TIP <p>Press <shortcut actionId="ShowIntentionActions"/> when your caret is at the underlined text
-	// to see how GoLand suggests fixing the warning.</p><p>Alternatively, if available, click the lightbulb to view possible fixes.</p>
-	s := "gopher"
-	fmt.Println(fmt.Sprintf("Hello and welcome, %s!", s))
-
-	for i := 1; i <= 5; i++ {
-		//TIP <p>To start your debugging session, right-click your code in the editor and select the Debug option.</p> <p>We have set one <icon src="AllIcons.Debugger.Db_set_breakpoint"/> breakpoint
-		// for you, but you can always add more by pressing <shortcut actionId="ToggleLineBreakpoint"/>.</p>
-		fmt.Println("i =", 100/i)
+	f, err := tea.LogToFile("debug.log", "[debug gophkeeper client]")
+	if err != nil {
+		fmt.Println("fatal:", err)
+		os.Exit(1)
 	}
+	defer f.Close()
 
-	time.Now().UnixNano()
+	gService := grpcclient.NewService("localhost:8090")
+	lRepo := localrepository.NewLocalRepository()
+	syncService := &syncroniser.Syncroniser{Local: lRepo, Remote: gService, SyncedUpTo: 0}
+	listFormFiller := bubbleactions.NewFillListFormService(syncService, lRepo)
+
+	cancelInputController := bubbleactions.NewCancelInputController()
+	addSecretController := bubbleactions.NewAddSecretController(gService, syncService, lRepo, listFormFiller)
+	addSecretFormController := bubbleactions.NewAddSecretFormController(lRepo, addSecretController, cancelInputController)
+	editSecretController := bubbleactions.NewEditSecretController(gService, syncService, lRepo, listFormFiller)
+	editSecretFormController := bubbleactions.NewEditSecretFormController(lRepo, editSecretController, cancelInputController)
+	listModel := bubbleforms.NewListModel(addSecretFormController, editSecretFormController)
+	listModelTea := tea.Model(listModel)
+
+	signInController := bubbleactions.NewSignInController(gService, gService.SignIn, listFormFiller)
+	signUpController := bubbleactions.NewSignInController(gService, gService.SignUp, listFormFiller)
+
+	loginModel := bubbleforms.NewInputsModel(
+		[]bubbleforms.InputField{
+			{
+				Type:  bubbleforms.InputTextPlain,
+				Title: "Login",
+				Value: "",
+			},
+			{
+				Type:  bubbleforms.InputTextPassword,
+				Title: "Password",
+				Value: "",
+			},
+		},
+		[]bubbleforms.InputButton{
+			{
+				Label:   "Sign in",
+				Handler: signInController,
+			},
+			{
+				Label:   "Sign up",
+				Handler: signUpController,
+			},
+		},
+		&listModelTea,
+	)
+
+	if _, err := tea.NewProgram(loginModel, tea.WithAltScreen()).Run(); err != nil {
+		fmt.Printf("could not start program: %s\n", err)
+		os.Exit(1)
+	}
 }
