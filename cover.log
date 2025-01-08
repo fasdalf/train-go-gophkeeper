@@ -32,8 +32,10 @@ github.com/fasdalf/train-go-gophkeeper/internal/server/db/storage/dbMigrations.g
 github.com/fasdalf/train-go-gophkeeper/internal/server/db/storage/dbStorage.go:26:				NewDBStorage			100.0%
 github.com/fasdalf/train-go-gophkeeper/internal/server/db/storage/dbStorage.go:43:				NewTestDbStorage		100.0%
 github.com/fasdalf/train-go-gophkeeper/internal/server/db/storage/dbStorage.go:54:				PrefixQuery			100.0%
+github.com/fasdalf/train-go-gophkeeper/internal/server/grpc/controller/createsecret.go:14:			CreateSecret			0.0%
 github.com/fasdalf/train-go-gophkeeper/internal/server/grpc/controller/listsecrets.go:15:			ListSecrets			0.0%
 github.com/fasdalf/train-go-gophkeeper/internal/server/grpc/controller/type.go:20:				NewGophKeeperServer		100.0%
+github.com/fasdalf/train-go-gophkeeper/internal/server/grpc/controller/updatesecret.go:16:			UpdateSecret			0.0%
 github.com/fasdalf/train-go-gophkeeper/internal/server/grpc/controller/usersignin.go:17:			UserSignIn			100.0%
 github.com/fasdalf/train-go-gophkeeper/internal/server/grpc/controller/usersignup.go:17:			UserSignUp			100.0%
 github.com/fasdalf/train-go-gophkeeper/internal/server/grpc/interceptors/sloginterceptor.go:12:			NewSlogInterceptor		100.0%
@@ -43,4 +45,4 @@ github.com/fasdalf/train-go-gophkeeper/internal/server/grpc/server/grpc.go:17:		
 github.com/fasdalf/train-go-gophkeeper/internal/server/grpc/server/grpc.go:37:					ListenAndServe			100.0%
 github.com/fasdalf/train-go-gophkeeper/internal/server/jwt/jwt.go:20:						BuildJWTString			100.0%
 github.com/fasdalf/train-go-gophkeeper/internal/server/jwt/jwt.go:36:						GetUserID			75.0%
-total:														(statements)			88.7%
+total:														(statements)			82.1%

@@ -77,21 +77,25 @@
 				
 				<option value="file10">github.com/fasdalf/train-go-gophkeeper/internal/server/db/storage/dbStorage.go (100.0%)</option>
 				
-				<option value="file11">github.com/fasdalf/train-go-gophkeeper/internal/server/grpc/controller/listsecrets.go (0.0%)</option>
+				<option value="file11">github.com/fasdalf/train-go-gophkeeper/internal/server/grpc/controller/createsecret.go (0.0%)</option>
 				
-				<option value="file12">github.com/fasdalf/train-go-gophkeeper/internal/server/grpc/controller/type.go (100.0%)</option>
+				<option value="file12">github.com/fasdalf/train-go-gophkeeper/internal/server/grpc/controller/listsecrets.go (0.0%)</option>
 				
-				<option value="file13">github.com/fasdalf/train-go-gophkeeper/internal/server/grpc/controller/usersignin.go (100.0%)</option>
+				<option value="file13">github.com/fasdalf/train-go-gophkeeper/internal/server/grpc/controller/type.go (100.0%)</option>
 				
-				<option value="file14">github.com/fasdalf/train-go-gophkeeper/internal/server/grpc/controller/usersignup.go (100.0%)</option>
+				<option value="file14">github.com/fasdalf/train-go-gophkeeper/internal/server/grpc/controller/updatesecret.go (0.0%)</option>
 				
-				<option value="file15">github.com/fasdalf/train-go-gophkeeper/internal/server/grpc/interceptors/sloginterceptor.go (100.0%)</option>
+				<option value="file15">github.com/fasdalf/train-go-gophkeeper/internal/server/grpc/controller/usersignin.go (100.0%)</option>
 				
-				<option value="file16">github.com/fasdalf/train-go-gophkeeper/internal/server/grpc/interceptors/validatetokeninterceptor.go (100.0%)</option>
+				<option value="file16">github.com/fasdalf/train-go-gophkeeper/internal/server/grpc/controller/usersignup.go (100.0%)</option>
 				
-				<option value="file17">github.com/fasdalf/train-go-gophkeeper/internal/server/grpc/server/grpc.go (100.0%)</option>
+				<option value="file17">github.com/fasdalf/train-go-gophkeeper/internal/server/grpc/interceptors/sloginterceptor.go (100.0%)</option>
 				
-				<option value="file18">github.com/fasdalf/train-go-gophkeeper/internal/server/jwt/jwt.go (81.8%)</option>
+				<option value="file18">github.com/fasdalf/train-go-gophkeeper/internal/server/grpc/interceptors/validatetokeninterceptor.go (100.0%)</option>
+				
+				<option value="file19">github.com/fasdalf/train-go-gophkeeper/internal/server/grpc/server/grpc.go (100.0%)</option>
+				
+				<option value="file20">github.com/fasdalf/train-go-gophkeeper/internal/server/jwt/jwt.go (81.8%)</option>
 				
 				</select>
 			</div>
@@ -718,6 +722,38 @@ func (s *DBProxy) PrefixQuery(query string) string <span class="cov8" title="1">
 import (
         "context"
         "log/slog"
+
+        "google.golang.org/grpc/codes"
+        "google.golang.org/grpc/status"
+
+        pb "github.com/fasdalf/train-go-gophkeeper/internal/common/proto/gophkeeperserver"
+        "github.com/fasdalf/train-go-gophkeeper/internal/server/grpc/contextkeys"
+)
+
+func (s *GophKeeperServer) CreateSecret(ctx context.Context, r *pb.CreateSecretRequest) (*pb.CreateSecretResponse, error) <span class="cov0" title="0">{
+        // Protected with NewValidateTokenInterceptor()
+        userID := ctx.Value(contextkeys.UserIDKey).(int64)
+
+        secret, err := s.secretRepo.Create(ctx, userID, r.GetData())
+        if err != nil </span><span class="cov0" title="0">{
+                slog.Error("failed to create secret", "err", err)
+                gErr := status.Errorf(codes.Internal, "failed to create secret")
+                return nil, gErr
+        }</span>
+
+        <span class="cov0" title="0">resp := &amp;pb.CreateSecretResponse{
+                Id: secret.ID,
+                Ts: secret.UpdatedAt,
+        }
+        return resp, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file12" style="display: none">package controller
+
+import (
+        "context"
+        "log/slog"
         "time"
 
         "google.golang.org/grpc/codes"
@@ -728,13 +764,9 @@ import (
 )
 
 func (s *GophKeeperServer) ListSecrets(ctx context.Context, r *pb.ListSecretsRequest) (*pb.ListSecretsResponse, error) <span class="cov0" title="0">{
+        // Protected with NewValidateTokenInterceptor()
         userID := ctx.Value(contextkeys.UserIDKey).(int64)
-        if userID == 0 </span><span class="cov0" title="0">{
-                slog.Error("user is not loaded")
-                gErr := status.Errorf(codes.Internal, "user is not loaded")
-                return nil, gErr
-        }</span>
-        <span class="cov0" title="0">syncTs := time.Now().UnixNano()
+        syncTs := time.Now().UnixNano()
         fromTs := int64(0)
         if r != nil </span><span class="cov0" title="0">{
                 fromTs = r.FromTs
@@ -765,7 +797,7 @@ func (s *GophKeeperServer) ListSecrets(ctx context.Context, r *pb.ListSecretsReq
 }
 </pre>
 		
-		<pre class="file" id="file12" style="display: none">package controller
+		<pre class="file" id="file13" style="display: none">package controller
 
 import (
         pb "github.com/fasdalf/train-go-gophkeeper/internal/common/proto/gophkeeperserver"
@@ -800,7 +832,56 @@ func NewGophKeeperServer(
 }</span>
 </pre>
 		
-		<pre class="file" id="file13" style="display: none">package controller
+		<pre class="file" id="file14" style="display: none">package controller
+
+import (
+        "context"
+        "errors"
+        "log/slog"
+
+        "google.golang.org/grpc/codes"
+        "google.golang.org/grpc/status"
+
+        pb "github.com/fasdalf/train-go-gophkeeper/internal/common/proto/gophkeeperserver"
+        "github.com/fasdalf/train-go-gophkeeper/internal/server/grpc/contextkeys"
+        "github.com/fasdalf/train-go-gophkeeper/internal/server/model/repository"
+)
+
+func (s *GophKeeperServer) UpdateSecret(ctx context.Context, r *pb.UpdateSecretRequest) (*pb.UpdateSecretResponse, error) <span class="cov0" title="0">{
+        // Protected with NewValidateTokenInterceptor()
+        userID := ctx.Value(contextkeys.UserIDKey).(int64)
+
+        secret, err := s.secretRepo.FindById(ctx, r.GetId())
+        if err != nil || secret.UserId != userID </span><span class="cov0" title="0">{
+                if err == nil </span><span class="cov0" title="0">{
+                        err = errors.New("bad boy")
+                }</span>
+                <span class="cov0" title="0">slog.Error("failed to create secret", "err", err)
+                gErr := status.Errorf(codes.Internal, "failed to create secret")
+                return nil, gErr</span>
+        }
+
+        <span class="cov0" title="0">if secret.UpdatedAt != r.GetOldTs() </span><span class="cov0" title="0">{
+                err = repository.ErrSecretTimeNotMatch
+        }</span>
+
+        <span class="cov0" title="0">if err == nil </span><span class="cov0" title="0">{
+                secret, err = s.secretRepo.Update(ctx, r.GetId(), r.GetData(), r.GetOldTs())
+        }</span>
+
+        <span class="cov0" title="0">if errors.Is(err, repository.ErrSecretTimeNotMatch) </span><span class="cov0" title="0">{
+                return &amp;pb.UpdateSecretResponse{Status: pb.TimeStampStatus_TS_MISMATCH}, nil
+        }</span>
+
+        <span class="cov0" title="0">resp := &amp;pb.UpdateSecretResponse{
+                Status: pb.TimeStampStatus_SUCCESS,
+                NewTs:  secret.UpdatedAt,
+        }
+        return resp, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file15" style="display: none">package controller
 
 import (
         "context"
@@ -840,7 +921,7 @@ func (s *GophKeeperServer) UserSignIn(ctx context.Context, r *pb.UserSignInReque
 }
 </pre>
 		
-		<pre class="file" id="file14" style="display: none">package controller
+		<pre class="file" id="file16" style="display: none">package controller
 
 import (
         "context"
@@ -880,7 +961,7 @@ func (s *GophKeeperServer) UserSignUp(ctx context.Context, r *pb.UserSignUpReque
 }
 </pre>
 		
-		<pre class="file" id="file15" style="display: none">package interceptors
+		<pre class="file" id="file17" style="display: none">package interceptors
 
 import (
         "context"
@@ -903,7 +984,7 @@ func NewSlogInterceptor() grpc.UnaryServerInterceptor <span class="cov8" title="
 }
 </pre>
 		
-		<pre class="file" id="file16" style="display: none">package interceptors
+		<pre class="file" id="file18" style="display: none">package interceptors
 
 import (
         "context"
@@ -950,7 +1031,7 @@ func getFirstMd(ctx context.Context, key string) (s string) <span class="cov8" t
 }
 </pre>
 		
-		<pre class="file" id="file17" style="display: none">package grpcserver
+		<pre class="file" id="file19" style="display: none">package grpcserver
 
 import (
         "github.com/fasdalf/train-go-gophkeeper/internal/server/model/repository"
@@ -998,7 +1079,7 @@ func ListenAndServe(server *grpc.Server, addr string) error <span class="cov8" t
 }
 </pre>
 		
-		<pre class="file" id="file18" style="display: none">package jwt
+		<pre class="file" id="file20" style="display: none">package jwt
 
 import (
         "fmt"
