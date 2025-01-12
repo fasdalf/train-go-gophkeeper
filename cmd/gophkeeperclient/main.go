@@ -2,15 +2,11 @@ package main
 
 import (
 	"fmt"
+	"github.com/fasdalf/train-go-gophkeeper/internal/client/mvc"
 	"os"
 
 	tea "github.com/charmbracelet/bubbletea"
 
-	"github.com/fasdalf/train-go-gophkeeper/internal/client/controller/bubbleactions"
-	"github.com/fasdalf/train-go-gophkeeper/internal/client/services/grpcclient"
-	"github.com/fasdalf/train-go-gophkeeper/internal/client/services/localrepository"
-	"github.com/fasdalf/train-go-gophkeeper/internal/client/services/syncroniser"
-	"github.com/fasdalf/train-go-gophkeeper/internal/client/view/bubbleforms"
 	"github.com/fasdalf/train-go-gophkeeper/internal/common/printbuild"
 )
 
@@ -42,49 +38,7 @@ func main() {
 	}
 	defer f.Close()
 
-	gService := grpcclient.NewService("localhost:8090")
-	lRepo := localrepository.NewLocalRepository()
-	syncService := &syncroniser.Syncroniser{Local: lRepo, Remote: gService, SyncedUpTo: 0}
-	listFormFiller := bubbleactions.NewFillListFormService(syncService, lRepo)
-
-	cancelInputController := bubbleactions.NewCancelInputController()
-	addSecretController := bubbleactions.NewAddSecretController(gService, syncService, lRepo, listFormFiller)
-	addSecretFormController := bubbleactions.NewAddSecretFormController(lRepo, addSecretController, cancelInputController)
-	editSecretController := bubbleactions.NewEditSecretController(gService, syncService, lRepo, listFormFiller)
-	editSecretFormController := bubbleactions.NewEditSecretFormController(lRepo, editSecretController, cancelInputController)
-	listModel := bubbleforms.NewListModel(addSecretFormController, editSecretFormController)
-	listModelTea := tea.Model(listModel)
-
-	signInController := bubbleactions.NewSignInController(gService, gService.SignIn, listFormFiller)
-	signUpController := bubbleactions.NewSignInController(gService, gService.SignUp, listFormFiller)
-
-	loginModel := bubbleforms.NewInputsModel(
-		[]bubbleforms.InputField{
-			{
-				Type:  bubbleforms.InputTextPlain,
-				Title: "Login",
-				Value: "",
-			},
-			{
-				Type:  bubbleforms.InputTextPassword,
-				Title: "Password",
-				Value: "",
-			},
-		},
-		[]bubbleforms.InputButton{
-			{
-				Label:   "Sign in",
-				Handler: signInController,
-			},
-			{
-				Label:   "Sign up",
-				Handler: signUpController,
-			},
-		},
-		&listModelTea,
-	)
-
-	if _, err := tea.NewProgram(loginModel, tea.WithAltScreen()).Run(); err != nil {
+	if _, err := tea.NewProgram(mvc.NewModel(), tea.WithAltScreen()).Run(); err != nil {
 		fmt.Printf("could not start program: %s\n", err)
 		os.Exit(1)
 	}

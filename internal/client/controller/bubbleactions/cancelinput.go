@@ -2,17 +2,13 @@ package bubbleactions
 
 import (
 	tea "github.com/charmbracelet/bubbletea"
-	ifcs "github.com/fasdalf/train-go-gophkeeper/internal/client/interfaces"
 	"github.com/fasdalf/train-go-gophkeeper/internal/client/view/bubbleforms"
 	"log/slog"
 )
 
-var typeCheckCancelInputController ifcs.ButtonHandler = &CancelInputController{}
+var typeCheckCancelInputController bubbleforms.ButtonController = &CancelInputController{}
 
 type CancelInputController struct {
-	service     ifcs.RemoteService
-	syncroniser ifcs.Syncroniser
-	repository  ifcs.LocalRepository
 }
 
 func NewCancelInputController() *CancelInputController {

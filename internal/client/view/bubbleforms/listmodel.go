@@ -4,7 +4,6 @@ import (
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	ifcs "github.com/fasdalf/train-go-gophkeeper/internal/client/interfaces"
 	"log/slog"
 )
 
@@ -23,10 +22,10 @@ func (i ListItem) FilterValue() string { return i.Name }
 
 type ListModel struct {
 	List          list.Model
-	AddHandler    ifcs.ButtonHandler
-	EditHandler   ifcs.ButtonHandler
-	DeleteHandler ifcs.ButtonHandler
-	ReloadHandler ifcs.ButtonHandler
+	AddHandler    ButtonController
+	EditHandler   ButtonController
+	DeleteHandler ButtonController
+	ReloadHandler ButtonController
 }
 
 func (m *ListModel) Init() tea.Cmd {
@@ -70,7 +69,7 @@ func (m *ListModel) View() string {
 	return docStyle.Render(m.List.View())
 }
 
-func NewListModel(addHandler ifcs.ButtonHandler, editHandler ifcs.ButtonHandler) *ListModel {
+func NewListModel(addHandler ButtonController, editHandler ButtonController) *ListModel {
 	lid := list.NewDefaultDelegate()
 	lid.ShowDescription = false
 	l := list.New([]list.Item{}, lid, 0, 0)

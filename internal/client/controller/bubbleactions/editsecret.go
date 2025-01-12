@@ -2,31 +2,35 @@ package bubbleactions
 
 import (
 	tea "github.com/charmbracelet/bubbletea"
-	ifcs "github.com/fasdalf/train-go-gophkeeper/internal/client/interfaces"
 	"github.com/fasdalf/train-go-gophkeeper/internal/client/model/entity"
 	"github.com/fasdalf/train-go-gophkeeper/internal/client/view/bubbleforms"
 	"github.com/fasdalf/train-go-gophkeeper/internal/client/view/convertors"
 	"log/slog"
 )
 
-var typeCheckEditSecretController ifcs.ButtonHandler = &EditSecretController{}
+var typeCheckEditSecretController bubbleforms.ButtonController = &EditSecretController{}
+
+type UpdateSyncroniser interface {
+	Update(secret entity.Secret) (serverID int64, serverUpdatedAt int64, err error)
+}
+
+type GetSecretLocalRepository interface {
+	GetSecret(id int) (entity.Secret, error)
+}
 
 type EditSecretController struct {
-	service         ifcs.RemoteService
-	syncroniser     ifcs.Syncroniser
-	repository      ifcs.LocalRepository
+	syncroniser     UpdateSyncroniser
+	repository      GetSecretLocalRepository
 	listFormFiller  ListFormFiller
 	secretDataValue any
 }
 
 func NewEditSecretController(
-	service ifcs.RemoteService,
-	syncroniser ifcs.Syncroniser,
-	repository ifcs.LocalRepository,
+	syncroniser UpdateSyncroniser,
+	repository GetSecretLocalRepository,
 	listFormFiller ListFormFiller,
 ) *EditSecretController {
 	return &EditSecretController{
-		service:        service,
 		syncroniser:    syncroniser,
 		repository:     repository,
 		listFormFiller: listFormFiller,

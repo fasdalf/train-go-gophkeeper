@@ -3,11 +3,9 @@ package localrepository
 
 import (
 	"errors"
-	ifcs "github.com/fasdalf/train-go-gophkeeper/internal/client/interfaces"
 	"github.com/fasdalf/train-go-gophkeeper/internal/client/model/entity"
 )
 
-var typeCheckLocalRepository ifcs.LocalRepository = &LocalRepository{}
 var ErrOutOfBounds = errors.New("out of bounds")
 
 type localItem struct {

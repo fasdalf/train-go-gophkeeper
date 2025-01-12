@@ -3,7 +3,6 @@ package bubbleactions
 import (
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
-	ifcs "github.com/fasdalf/train-go-gophkeeper/internal/client/interfaces"
 	"github.com/fasdalf/train-go-gophkeeper/internal/client/view/bubbleforms"
 	"log/slog"
 )
@@ -15,14 +14,22 @@ type ListFormFiller interface {
 	Fill(form *bubbleforms.InputsModel) tea.Model
 }
 
+type SyncSyncroniser interface {
+	Sync() error
+}
+
+type ListSecretsLocalRepository interface {
+	ListSecrets() []string
+}
+
 type FillListFormService struct {
-	syncroniser ifcs.Syncroniser
-	repository  ifcs.LocalRepository
+	syncroniser SyncSyncroniser
+	repository  ListSecretsLocalRepository
 }
 
 func NewFillListFormService(
-	syncroniser ifcs.Syncroniser,
-	repository ifcs.LocalRepository,
+	syncroniser SyncSyncroniser,
+	repository ListSecretsLocalRepository,
 ) *FillListFormService {
 	return &FillListFormService{
 		syncroniser: syncroniser,
@@ -60,6 +67,6 @@ type FillListFormMock struct {
 	Result tea.Model
 }
 
-func (s *FillListFormMock) Fill(form *bubbleforms.InputsModel) tea.Model {
+func (s *FillListFormMock) Fill(*bubbleforms.InputsModel) tea.Model {
 	return s.Result
 }

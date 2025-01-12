@@ -2,25 +2,24 @@ package bubbleactions
 
 import (
 	tea "github.com/charmbracelet/bubbletea"
-	ifcs "github.com/fasdalf/train-go-gophkeeper/internal/client/interfaces"
 	"github.com/fasdalf/train-go-gophkeeper/internal/client/model/entity"
 	"github.com/fasdalf/train-go-gophkeeper/internal/client/view/bubbleforms"
 	"github.com/fasdalf/train-go-gophkeeper/internal/client/view/convertors"
 	"log/slog"
 )
 
-var typeCheckEditSecretFormController ifcs.ButtonHandler = &EditSecretFormController{}
+var typeCheckEditSecretFormController bubbleforms.ButtonController = &EditSecretFormController{}
 
 type EditSecretFormController struct {
-	repository           ifcs.LocalRepository
-	editSecretController ifcs.ButtonHandler
-	cancelController     ifcs.ButtonHandler
+	repository           GetSecretLocalRepository
+	editSecretController bubbleforms.ButtonController
+	cancelController     bubbleforms.ButtonController
 }
 
 func NewEditSecretFormController(
-	repository ifcs.LocalRepository,
-	editSecretController ifcs.ButtonHandler,
-	cancelController ifcs.ButtonHandler,
+	repository GetSecretLocalRepository,
+	editSecretController bubbleforms.ButtonController,
+	cancelController bubbleforms.ButtonController,
 ) *EditSecretFormController {
 	return &EditSecretFormController{
 		repository:           repository,

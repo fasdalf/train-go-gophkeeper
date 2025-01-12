@@ -5,7 +5,6 @@ import (
 	"github.com/charmbracelet/bubbles/cursor"
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
-	ifcs "github.com/fasdalf/train-go-gophkeeper/internal/client/interfaces"
 	"log/slog"
 	"strings"
 )
@@ -21,6 +20,10 @@ const (
 	promptInactive = " - "
 )
 
+type ButtonController interface {
+	Handle(m tea.Model) tea.Model
+}
+
 type InputType = int
 type InputField struct {
 	Type  InputType
@@ -29,7 +32,7 @@ type InputField struct {
 }
 type InputButton struct {
 	Label   string
-	Handler ifcs.ButtonHandler
+	Handler ButtonController
 }
 
 type InputsModel struct {
@@ -159,7 +162,7 @@ func (m *InputsModel) updateInputs(msg tea.Msg) tea.Cmd {
 	return tea.Batch(cmds...)
 }
 
-func (m *InputsModel) callHandler(buttonHandler ifcs.ButtonHandler) tea.Model {
+func (m *InputsModel) callHandler(buttonHandler ButtonController) tea.Model {
 	for i := range m.Fields {
 		switch m.Fields[i].Type {
 		case InputTextPlain, InputTextPassword:

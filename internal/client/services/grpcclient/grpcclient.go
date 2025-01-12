@@ -4,15 +4,12 @@ package grpcclient
 import (
 	"context"
 	"fmt"
-	ifcs "github.com/fasdalf/train-go-gophkeeper/internal/client/interfaces"
 	pb "github.com/fasdalf/train-go-gophkeeper/internal/common/proto/gophkeeperserver"
 	"github.com/fasdalf/train-go-gophkeeper/internal/server/jwt"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/metadata"
 )
-
-var typeCheckService ifcs.RemoteService = &Service{}
 
 type Service struct {
 	client pb.GophKeeperClient
@@ -21,7 +18,7 @@ type Service struct {
 
 func NewService(addr string) *Service {
 	conn, _ := grpc.NewClient(
-		"localhost:8090",
+		addr,
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 	)
 	client := pb.NewGophKeeperClient(conn)

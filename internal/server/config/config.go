@@ -21,10 +21,10 @@ const (
 )
 
 type Config struct {
-	GRPCAddr        string        `env:"GRPC_ADDRESS" json:"grpc_address"`
+	GRPCAddr        string        `env:"SERVER_GRPC_ADDRESS" json:"server_grpc_address"`
 	StorageDBDSN    string        `env:"DATABASE_URI" json:"database_uri"`
 	StorageDBPrefix string        `env:"DATABASE_TABLE_PREFIX" json:"database_table_prefix"`
-	CryptoKey       string        `env:"KEY" json:"key"`
+	CryptoKey       string        `env:"SERVER_KEY" json:"server_key"`
 	TokenExp        time.Duration `env:"TOKEN_EXP" json:"token_exp"`
 }
 

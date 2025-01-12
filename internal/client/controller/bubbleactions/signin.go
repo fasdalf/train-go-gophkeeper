@@ -2,22 +2,25 @@ package bubbleactions
 
 import (
 	tea "github.com/charmbracelet/bubbletea"
-	ifcs "github.com/fasdalf/train-go-gophkeeper/internal/client/interfaces"
 	"github.com/fasdalf/train-go-gophkeeper/internal/client/view/bubbleforms"
 	"log/slog"
 )
 
-var typeCheckSignInController ifcs.ButtonHandler = &SignInController{}
+var typeCheckSignInController bubbleforms.ButtonController = &SignInController{}
+
+type SetTokenRemoteService interface {
+	SetToken(token string)
+}
 
 type getTokenFunc func(login, pass string) (string, error)
 type SignInController struct {
-	service        ifcs.RemoteService
+	service        SetTokenRemoteService
 	getToken       getTokenFunc
 	listFormFiller ListFormFiller
 }
 
 func NewSignInController(
-	service ifcs.RemoteService,
+	service SetTokenRemoteService,
 	getToken getTokenFunc,
 	listFormFiller ListFormFiller,
 ) *SignInController {
