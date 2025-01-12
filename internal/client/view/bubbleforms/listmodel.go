@@ -1,6 +1,7 @@
 package bubbleforms
 
 import (
+	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -20,12 +21,14 @@ func (i ListItem) Title() string       { return i.Name }
 func (i ListItem) Description() string { return i.Desc }
 func (i ListItem) FilterValue() string { return i.Name }
 
+type KeyController struct {
+	Controller ButtonController
+	KeyBinding key.Binding
+}
+
 type ListModel struct {
-	List          list.Model
-	AddHandler    ButtonController
-	EditHandler   ButtonController
-	DeleteHandler ButtonController
-	ReloadHandler ButtonController
+	List           list.Model
+	KeyControllers []KeyController
 }
 
 func (m *ListModel) Init() tea.Cmd {
@@ -36,24 +39,11 @@ func (m *ListModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	slog.Info("ListModel update called", "msg", msg)
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
-		switch msg.String() {
-		case "ctrl+c":
-			slog.Info("ListModel got ctrl+c")
-			return m, tea.Quit
-		case "insert":
-			m2 := m.AddHandler.Handle(m)
-			return m2, m2.Init()
-		case "enter":
-			m2 := m.EditHandler.Handle(m)
-			return m2, m2.Init()
-		case "delete":
-			//m2 := m.DeleteHandler.Handle(m)
-			//return m2, m2.Init()
-			return m, nil
-		case "ctrl+r":
-			//m2 := m.ReloadHandler.Handle(m)
-			//return m2, m2.Init()
-			return m, nil
+		for _, kc := range m.KeyControllers {
+			if key.Matches(msg, kc.KeyBinding) {
+				m2 := kc.Controller.Handle(m)
+				return m2, m2.Init()
+			}
 		}
 	case tea.WindowSizeMsg:
 		h, v := docStyle.GetFrameSize()
@@ -70,18 +60,42 @@ func (m *ListModel) View() string {
 }
 
 func NewListModel(addHandler ButtonController, editHandler ButtonController) *ListModel {
+	quitController := KeyController{
+		Controller: &QuitController{},
+		KeyBinding: key.NewBinding(
+			key.WithKeys("ctrl+c"),
+			key.WithHelp("ctrl+c", "quit"),
+		),
+	}
+	addController := KeyController{
+		Controller: addHandler,
+		KeyBinding: key.NewBinding(
+			key.WithKeys("insert"),
+			key.WithHelp("insert", "add secret"),
+		),
+	}
+	editController := KeyController{
+		Controller: editHandler,
+		KeyBinding: key.NewBinding(
+			key.WithKeys("enter"),
+			key.WithHelp("enter", "edit current secret"),
+		),
+	}
+
 	lid := list.NewDefaultDelegate()
 	lid.ShowDescription = false
 	l := list.New([]list.Item{}, lid, 0, 0)
 	l.Title = listTitle
 	l.SetShowTitle(true)
-	// TODO: ##@@ implement AdditionalShortHelpKeys + AdditionalFullHelpKeys
-	l.SetShowHelp(false)
+	l.AdditionalShortHelpKeys = func() []key.Binding {
+		return []key.Binding{quitController.KeyBinding, addController.KeyBinding, editController.KeyBinding}
+	}
+	l.AdditionalFullHelpKeys = l.AdditionalShortHelpKeys
+	l.SetShowHelp(true)
 	l.DisableQuitKeybindings()
 	m := ListModel{
-		List:        l,
-		AddHandler:  addHandler,
-		EditHandler: editHandler,
+		List:           l,
+		KeyControllers: []KeyController{quitController, addController, editController},
 	}
 
 	return &m
