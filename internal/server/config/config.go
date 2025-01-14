@@ -39,7 +39,7 @@ func GetConfig() Config {
 	return *config
 }
 
-func init() {
+func InitConfig() {
 	// Env. variables.
 	if err := env.Parse(config); err != nil {
 		fmt.Printf("%+v\n", err)

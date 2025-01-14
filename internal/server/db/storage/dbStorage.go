@@ -1,5 +1,5 @@
-// Package dbstorage - DB storage
-package dbstorage
+// Package storage - DB storage
+package storage
 
 import (
 	"context"
@@ -23,20 +23,14 @@ type DBProxy struct {
 	Prefix string
 }
 
-func NewDBStorage(ctx context.Context, dsn string, prefix string) (s *DBProxy, err error) {
+func NewDBStorage(ctx context.Context, dsn string, prefix string) (s *DBProxy) {
 	// err is possible only when no driver imported
 	db, _ := sql.Open("pgx", dsn)
 	s = &DBProxy{
 		Db:     db,
 		Prefix: prefix,
 	}
-
-	// IRL it should be done in main() with separate command line flag.
-	if err = s.Bootstrap(ctx); err != nil {
-		return nil, fmt.Errorf("failed to bootstrap database: %w", err)
-	}
-
-	return s, nil
+	return s
 }
 
 // NewTestDbStorage creates new DBProxy with random prefix for parallel tests run.
@@ -47,7 +41,14 @@ func NewTestDbStorage() (s *DBProxy, err error) {
 		dsn = envDSN
 	}
 
-	return NewDBStorage(context.Background(), dsn, fmt.Sprintf("go_test_%06d_", rand.Intn(999998)+1))
+	ctx := context.Background()
+	s = NewDBStorage(ctx, dsn, fmt.Sprintf("go_test_%06d_", rand.Intn(999998)+1))
+
+	if err = s.Bootstrap(ctx); err != nil {
+		return nil, fmt.Errorf("failed to bootstrap database: %w", err)
+	}
+
+	return s, nil
 }
 
 // PrefixQuery adds prefix to table name where TablePrefix used

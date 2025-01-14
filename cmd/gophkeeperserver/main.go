@@ -5,7 +5,7 @@ import (
 	"github.com/fasdalf/train-go-gophkeeper/internal/common/printbuild"
 	"github.com/fasdalf/train-go-gophkeeper/internal/server/config"
 	"github.com/fasdalf/train-go-gophkeeper/internal/server/db/dbrepository"
-	"github.com/fasdalf/train-go-gophkeeper/internal/server/db/storage"
+	dbstorage "github.com/fasdalf/train-go-gophkeeper/internal/server/db/storage"
 	grpcserver "github.com/fasdalf/train-go-gophkeeper/internal/server/grpc/server"
 	"log/slog"
 	"os"
@@ -35,10 +35,21 @@ func main() {
 	// * Write cross-platform build script for client and server.
 
 	ctx := context.Background()
+	config.InitConfig()
 	cfg := config.GetConfig()
-	db, err := dbstorage.NewDBStorage(ctx, cfg.StorageDBDSN, cfg.StorageDBPrefix)
-	if err != nil {
-		slog.Error("can not migrate the DB", "error", err)
+	db := dbstorage.NewDBStorage(ctx, cfg.StorageDBDSN, cfg.StorageDBPrefix)
+	if done, err := db.MigrateByFlag(); err != nil || done {
+		if err != nil {
+			slog.Error("can not use the DB", "error", err)
+			panic(err)
+		}
+
+		if done {
+			os.Exit(0)
+		}
+	}
+	if err := db.CheckVersion(ctx); err != nil {
+		slog.Error("can not use the DB", "error", err)
 
 		panic(err)
 	}

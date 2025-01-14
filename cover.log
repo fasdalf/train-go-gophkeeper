@@ -7,6 +7,8 @@ github.com/fasdalf/train-go-gophkeeper/internal/common/utils/localip/localip.go:
 github.com/fasdalf/train-go-gophkeeper/internal/common/utils/localip/localip.go:22:				ValidateIPStringInSubnet	100.0%
 github.com/fasdalf/train-go-gophkeeper/internal/common/utils/localip/localip.go:37:				GetFreePort			100.0%
 github.com/fasdalf/train-go-gophkeeper/internal/common/utils/randutils/randutils.go:11:				RandomString			100.0%
+github.com/fasdalf/train-go-gophkeeper/internal/server/config/config.go:38:					GetConfig			100.0%
+github.com/fasdalf/train-go-gophkeeper/internal/server/config/config.go:42:					InitConfig			100.0%
 github.com/fasdalf/train-go-gophkeeper/internal/server/db/dbrepository/secret.go:25:				NewSecretDBRepository		100.0%
 github.com/fasdalf/train-go-gophkeeper/internal/server/db/dbrepository/secret.go:31:				FindById			100.0%
 github.com/fasdalf/train-go-gophkeeper/internal/server/db/dbrepository/secret.go:47:				FindAfter			83.3%
@@ -26,12 +28,17 @@ github.com/fasdalf/train-go-gophkeeper/internal/server/db/dbrepository/user.go:7
 github.com/fasdalf/train-go-gophkeeper/internal/server/db/dbrepository/usermock.go:19:				FindById			100.0%
 github.com/fasdalf/train-go-gophkeeper/internal/server/db/dbrepository/usermock.go:24:				FindByLogin			100.0%
 github.com/fasdalf/train-go-gophkeeper/internal/server/db/dbrepository/usermock.go:29:				Create				100.0%
-github.com/fasdalf/train-go-gophkeeper/internal/server/db/storage/dbMigrations.go:11:				Bootstrap			100.0%
-github.com/fasdalf/train-go-gophkeeper/internal/server/db/storage/dbMigrations.go:39:				Teardown			100.0%
-github.com/fasdalf/train-go-gophkeeper/internal/server/db/storage/dbMigrations.go:50:				runMigrations			100.0%
+github.com/fasdalf/train-go-gophkeeper/internal/server/db/storage/command.go:16:				init				100.0%
+github.com/fasdalf/train-go-gophkeeper/internal/server/db/storage/command.go:22:				MigrateByFlag			100.0%
 github.com/fasdalf/train-go-gophkeeper/internal/server/db/storage/dbStorage.go:26:				NewDBStorage			100.0%
-github.com/fasdalf/train-go-gophkeeper/internal/server/db/storage/dbStorage.go:43:				NewTestDbStorage		100.0%
-github.com/fasdalf/train-go-gophkeeper/internal/server/db/storage/dbStorage.go:54:				PrefixQuery			100.0%
+github.com/fasdalf/train-go-gophkeeper/internal/server/db/storage/dbStorage.go:37:				NewTestDbStorage		100.0%
+github.com/fasdalf/train-go-gophkeeper/internal/server/db/storage/dbStorage.go:55:				PrefixQuery			100.0%
+github.com/fasdalf/train-go-gophkeeper/internal/server/db/storage/goose.go:23:					init				100.0%
+github.com/fasdalf/train-go-gophkeeper/internal/server/db/storage/goose.go:29:					CheckVersion			100.0%
+github.com/fasdalf/train-go-gophkeeper/internal/server/db/storage/goose.go:43:					Bootstrap			100.0%
+github.com/fasdalf/train-go-gophkeeper/internal/server/db/storage/goose.go:52:					Teardown			100.0%
+github.com/fasdalf/train-go-gophkeeper/internal/server/db/storage/goose.go:65:					Reset				100.0%
+github.com/fasdalf/train-go-gophkeeper/internal/server/db/storage/goose.go:76:					setGoosePrefix			100.0%
 github.com/fasdalf/train-go-gophkeeper/internal/server/grpc/controller/createsecret.go:14:			CreateSecret			0.0%
 github.com/fasdalf/train-go-gophkeeper/internal/server/grpc/controller/listsecrets.go:15:			ListSecrets			0.0%
 github.com/fasdalf/train-go-gophkeeper/internal/server/grpc/controller/type.go:20:				NewGophKeeperServer		100.0%
@@ -45,4 +52,4 @@ github.com/fasdalf/train-go-gophkeeper/internal/server/grpc/server/grpc.go:17:		
 github.com/fasdalf/train-go-gophkeeper/internal/server/grpc/server/grpc.go:37:					ListenAndServe			100.0%
 github.com/fasdalf/train-go-gophkeeper/internal/server/jwt/jwt.go:20:						BuildJWTString			100.0%
 github.com/fasdalf/train-go-gophkeeper/internal/server/jwt/jwt.go:36:						GetUserID			75.0%
-total:														(statements)			82.1%
+total:														(statements)			84.5%

@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func TestNewTestDbStorage(t *testing.T) {
+func TestCheckVersion(t *testing.T) {
 	oldEnv := os.Getenv(testDBDSNENVKey)
 	os.Setenv(testDBDSNENVKey, testDBDSNENVDefault)
 	defer os.Setenv(testDBDSNENVKey, oldEnv)
@@ -22,20 +22,21 @@ func TestNewTestDbStorage(t *testing.T) {
 		return
 	}
 
-	err = got.Teardown(context.Background())
+	err = got.CheckVersion(context.Background())
 	if err != nil {
-		t.Errorf("Teardown() error = %v", err)
+		t.Errorf("CheckVersion() error = %v", err)
 		return
 	}
 
-	os.Setenv(testDBDSNENVKey, "fail"+testDBDSNENVDefault)
-	got, err = NewTestDbStorage()
-	if err == nil {
-		t.Errorf("NewTestDbStorage() did not set error")
+	err = got.Reset(context.Background())
+	if err != nil {
+		t.Errorf("Reset() error = %v", err)
 		return
 	}
-	if got != nil {
-		t.Errorf("NewTestDbStorage() did not return nil")
+
+	err = got.CheckVersion(context.Background())
+	if err == nil {
+		t.Errorf("CheckVersion() with no error on empty db")
 		return
 	}
 }
