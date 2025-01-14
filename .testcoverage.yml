@@ -1,0 +1,9 @@
+# For not used here package https://github.com/vladopajic/go-test-coverage
+# Holds regexp rules which will exclude matched files or packages
+# from coverage statistics
+exclude:
+  # Exclude files or packages matching their paths
+  paths:
+#    - \.pb\.go$    # excludes all protobuf generated files
+    - ^internal/client
+

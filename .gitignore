@@ -15,7 +15,7 @@
 *.out
 
 # Dependency directories (remove the comment below to include it)
-# vendor/
+vendor/
 
 # Go workspace file
 go.work
@@ -24,5 +24,13 @@ go.work.sum
 # env file
 .env
 
-.vscode
+# IDEs directories
 .idea
+.vscode
+
+# docker
+/deploy/docker/.env
+/deploy/docker/docker-compose.override.yml
+/docker-compose.override.yml
+/.env
+/deploy/data/logs/*
