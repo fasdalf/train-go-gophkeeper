@@ -10,12 +10,12 @@ func PasswordToFields(sData entity.SecretData) (fields []bubbleforms.InputField)
 	fields = []bubbleforms.InputField{
 		{
 			Type:  bubbleforms.InputTextPlain,
-			Title: "Name",
+			Title: bubbleforms.UITextInputsModelName,
 			Value: sData.Name,
 		},
 		{
 			Type:  bubbleforms.InputTextPlain,
-			Title: "Password",
+			Title: bubbleforms.UITextInputsModelPassword,
 			Value: sData.Value.(entity.Password).Pass,
 		},
 	}

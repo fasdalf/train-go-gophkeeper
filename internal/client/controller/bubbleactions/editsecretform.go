@@ -49,11 +49,11 @@ func (s *EditSecretFormController) Handle(m tea.Model) tea.Model {
 	fields := []bubbleforms.InputField{}
 	buttons := []bubbleforms.InputButton{
 		{
-			Label:   "Save edit",
+			Label:   bubbleforms.UITextInputsModelSaveEdit,
 			Handler: s.editSecretController,
 		},
 		{
-			Label:   "Cancel",
+			Label:   bubbleforms.UITextInputsModelCancel,
 			Handler: s.cancelController,
 		},
 	}

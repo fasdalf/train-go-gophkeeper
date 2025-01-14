@@ -9,6 +9,10 @@ import (
 )
 
 const listTitle = "secrets list"
+const listModelKBAddKey = "insert"
+const listModelKBAddDesc = "add secret"
+const listModelKBEditKey = "enter"
+const listModelKBEditDesc = "edit current secret"
 
 var docStyle = lipgloss.NewStyle().Margin(1, 2)
 
@@ -63,22 +67,22 @@ func NewListModel(addHandler ButtonController, editHandler ButtonController) *Li
 	quitController := KeyController{
 		Controller: &QuitController{},
 		KeyBinding: key.NewBinding(
-			key.WithKeys("ctrl+c"),
-			key.WithHelp("ctrl+c", "quit"),
+			key.WithKeys(KBQuitKey),
+			key.WithHelp(KBQuitKey, KBQuitDesc),
 		),
 	}
 	addController := KeyController{
 		Controller: addHandler,
 		KeyBinding: key.NewBinding(
-			key.WithKeys("insert"),
-			key.WithHelp("insert", "add secret"),
+			key.WithKeys(listModelKBAddKey),
+			key.WithHelp(listModelKBAddKey, listModelKBAddDesc),
 		),
 	}
 	editController := KeyController{
 		Controller: editHandler,
 		KeyBinding: key.NewBinding(
-			key.WithKeys("enter"),
-			key.WithHelp("enter", "edit current secret"),
+			key.WithKeys(listModelKBEditKey),
+			key.WithHelp(listModelKBEditKey, listModelKBEditDesc),
 		),
 	}
 

@@ -36,7 +36,7 @@ func (m *MessageModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, nil
 	case tea.KeyMsg:
 		switch msg.String() {
-		case "ctrl+c":
+		case KBQuitKey:
 			slog.Info("MessageModel got ctrl+c")
 			return m, tea.Quit
 		default:
@@ -51,9 +51,9 @@ func (m *MessageModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m *MessageModel) View() string {
-	action := "quit"
+	action := UITextMessageModelActionQuit
 	if m.Next != nil {
-		action = "continue"
+		action = UITextMessageModelActionContinue
 	}
-	return wordwrap.String(fmt.Sprintf("%s\n\nPress ANY key to %s.", m.Message, action), m.Width)
+	return wordwrap.String(fmt.Sprintf(UITextMessageModelActionTemplate, m.Message, action), m.Width)
 }

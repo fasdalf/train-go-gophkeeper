@@ -38,22 +38,22 @@ func NewModel() tea.Model {
 		[]bubbleforms.InputField{
 			{
 				Type:  bubbleforms.InputTextPlain,
-				Title: "Login",
+				Title: bubbleforms.UITextInputsModelLogin,
 				Value: "",
 			},
 			{
 				Type:  bubbleforms.InputTextPassword,
-				Title: "Password",
+				Title: bubbleforms.UITextInputsModelPassword,
 				Value: "",
 			},
 		},
 		[]bubbleforms.InputButton{
 			{
-				Label:   "Sign in",
+				Label:   bubbleforms.UITextInputsModelSignIn,
 				Handler: signInController,
 			},
 			{
-				Label:   "Sign up",
+				Label:   bubbleforms.UITextInputsModelSignUp,
 				Handler: signUpController,
 			},
 		},
